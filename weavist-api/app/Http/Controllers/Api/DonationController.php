@@ -23,13 +23,22 @@ class DonationController extends Controller
             'campaign_id' => 'required|exists:campaigns,id',
             'amount' => 'required|numeric|min:1',
             'donationMethod' => 'required|string',
+            'donor' => 'sometimes|array',
+            'donor.name' => 'sometimes|string',
+            'donor.phone' => 'sometimes|string',
+            'donor.email' => 'sometimes|email',
         ]);
+
+        $donor = $request->input('donor', []);
 
         $donation = Donation::create([
             'user_id' => Auth::id(),
             'campaign_id' => $request->campaign_id,
             'amount' => $request->amount,
             'donationMethod' => $request->donationMethod,
+            'donor_name' => $donor['name'] ?? null,
+            'donor_phone' => $donor['phone'] ?? null,
+            'donor_email' => $donor['email'] ?? null,
         ]);
 
         // update campaign raisedAmount

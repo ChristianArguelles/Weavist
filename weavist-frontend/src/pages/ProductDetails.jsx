@@ -42,8 +42,8 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden grid md:grid-cols-2 gap-6">
+    <div className="container py-8">
+      <div className="card overflow-hidden grid md:grid-cols-2 gap-6">
         {/* Image Section */}
         <div>
           <img
@@ -59,7 +59,7 @@ export default function ProductDetail() {
             <h1 className="text-3xl font-bold mb-2">
               {product.productName}
             </h1>
-            <p className="text-indigo-600 font-bold text-xl mb-4">
+            <p className="text-weave-red font-bold text-xl mb-4">
               ₱{Number(product.productPrice).toFixed(2)}
             </p>
 
@@ -80,7 +80,7 @@ export default function ProductDetail() {
           <div className="mt-6 flex gap-3">
             <button
               onClick={() => addItem(product, 1)}
-              className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="flex-1 btn-primary transition"
             >
               Add to Cart
             </button>
@@ -89,7 +89,8 @@ export default function ProductDetail() {
                 addItem(product, 1);
                 navigate("/checkout");
               }}
-              className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+              className="flex-1 bg-weave-deep text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
+              style={{ backgroundColor: 'var(--weave-deep)' }}
             >
               Buy Now
             </button>

@@ -50,4 +50,21 @@ class AuthController extends Controller
     public function profile(Request $r) {
         return response()->json($r->user());
     }
+
+    public function update(Request $r) {
+        $u = $r->user();
+        if (!$u) return response()->json(['message' => 'Unauthenticated'], 401);
+
+        $data = $r->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,'.$u->id,
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+        ]);
+
+        $u->fill($data);
+        $u->save();
+
+        return response()->json($u);
+    }
 }

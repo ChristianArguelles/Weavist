@@ -25,6 +25,7 @@ Route::post('/auth/login', [AuthController::class,'login']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/auth/logout',[AuthController::class,'logout']);
     Route::get('/profile',[AuthController::class,'profile']);
+    Route::put('/profile',[AuthController::class,'update']);
 
     // CRUD resources
     Route::apiResource('products', ProductController::class)->except(['index','show']);

@@ -1,141 +1,196 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 export default function SupportWeavers() {
   const [campaigns, setCampaigns] = useState([]);
-  const [donationAmount, setDonationAmount] = useState({});
-  const [donationMethod, setDonationMethod] = useState({});
-  const [loadingId, setLoadingId] = useState(null);
+  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [customAmount, setCustomAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [user, setUser] = useState({});
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+    // Prefer auth context user (already stored on login) for instant display
+    if (authUser) {
+      setUser(authUser);
+      setContactName(authUser.name || "");
+      setContactPhone(authUser.phone || "");
+      setContactEmail(authUser.email || "");
+    } else {
+      fetchUser();
+    }
+  }, [authUser]);
 
   async function fetchCampaigns() {
     try {
       const res = await api.get("/campaigns");
-      const data = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
+      const data = Array.isArray(res.data) ? res.data : res.data.data || res.data;
       setCampaigns(data);
     } catch (e) {
       console.error("Error fetching campaigns:", e);
     }
   }
 
-  async function handleDonate(campaignId) {
-    const amount = donationAmount[campaignId];
-    const method = donationMethod[campaignId] || "card";
+  async function fetchUser() {
+    try {
+      // backend exposes current user at GET /profile
+      const res = await api.get("/profile");
+      const u = res.data?.user || res.data;
+      setUser(u);
+      setContactName(u?.name || "");
+      setContactPhone(u?.phone || "");
+      setContactEmail(u?.email || "");
+    } catch (e) {
+      console.error("Error fetching user:", e);
+    }
+  }
+
+  async function handleDonate() {
+    const amount = selectedAmount === "custom" ? Number(customAmount) : Number(selectedAmount);
     if (!amount || isNaN(amount) || amount <= 0) {
-      alert("Enter a valid donation amount");
+      alert("Please enter a valid donation amount");
       return;
     }
-    setLoadingId(campaignId);
+    if (!paymentMethod) {
+      alert("Please select a payment method");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await api.post(
         "/donations",
         {
-          campaign_id: campaignId,
+          campaign_id: campaigns[0]?.id, // for now, donate to first campaign
           amount,
-          donationMethod: method,
+          method: paymentMethod,
+          donor: {
+            name: contactName,
+            phone: contactPhone,
+            email: contactEmail,
+          },
         },
         { withCredentials: true }
       );
-      alert(res.data.message || "Donation successful");
-      
-      setDonationAmount((prev) => ({ ...prev, [campaignId]: "" }));
-      setDonationMethod((prev) => ({ ...prev, [campaignId]: "card" }));
-      fetchCampaigns();
+      alert(res.data.message || "Donation successful!");
+      setSelectedAmount(null);
+      setCustomAmount("");
+      setPaymentMethod("");
     } catch (err) {
       console.error("Donation error:", err);
-      alert("Donation failed, try again");
+      alert("Donation failed, please try again.");
     } finally {
-      setLoadingId(null);
+      setLoading(false);
     }
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          Support Weavers
-        </h1>
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {campaigns.map((c) => (
-            <div
-              key={c.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-full"
+    <div>
+      <div className="container py-12 text-center">
+        <h1 className="text-4xl font-bold">Empowering Our Weavers</h1>
+        <p className="mt-4 max-w-2xl mx-auto text-gray-600">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+        </p>
+      </div>
+
+      <div className="container py-8">
+        <h2 className="text-3xl font-bold mb-6 text-center">Our Campaign</h2>
+        <div className="max-w-3xl mx-auto mb-8 text-center text-gray-600">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+        </div>
+
+        <div className="border-t"></div>
+
+        {/* Donation Amount */}
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-3">Choose Donation Amount</h3>
+          <div className="flex gap-3 mb-6">
+            {[100, 500, 1000].map((amt) => (
+              <button
+                key={amt}
+                onClick={() => setSelectedAmount(amt)}
+                className={`px-6 py-3 rounded-full border ${
+                  selectedAmount === amt ? "bg-weave-red text-white" : ""
+                }`}
+              >
+                ₱ {amt}
+              </button>
+            ))}
+            <button
+              onClick={() => setSelectedAmount("custom")}
+              className={`px-6 py-3 rounded-full border ${
+                selectedAmount === "custom" ? "bg-weave-red text-white" : ""
+              }`}
             >
-              {c.image && (
-                <img
-                  src={c.image}
-                  alt={c.title}
-                  className="w-full h-48 object-cover"
-                />
-              )}
-              <div className="p-6 flex-grow flex flex-col">
-                <h3 className="text-2xl font-semibold text-gray-800">{c.title}</h3>
-                <p className="text-gray-600 mt-2 flex-grow">
-                  {c.description?.slice(0, 120)}...
-                </p>
-                <div className="mt-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-indigo-600 h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${Math.min(100, (c.raisedAmount / (c.donationTarget || 1)) * 100)
-                          }%`,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    ₱{c.raisedAmount} raised of ₱{c.donationTarget}
-                  </div>
-                </div>
+              Custom
+            </button>
+          </div>
 
-                <div className="mt-6 space-y-3">
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Enter amount"
-                    value={donationAmount[c.id] || ""}
-                    onChange={(e) =>
-                      setDonationAmount((prev) => ({
-                        ...prev,
-                        [c.id]: e.target.value,
-                      }))
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+          {selectedAmount === "custom" && (
+            <input
+              type="number"
+              value={customAmount}
+              onChange={(e) => setCustomAmount(e.target.value)}
+              placeholder="Enter custom amount"
+              className="border rounded px-4 py-3 mb-6 w-64"
+            />
+          )}
 
-                  <select
-                    value={donationMethod[c.id] || "card"}
-                    onChange={(e) =>
-                      setDonationMethod((prev) => ({
-                        ...prev,
-                        [c.id]: e.target.value,
-                      }))
-                    }
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="card">Card</option>
-                    <option value="gcash">GCash</option>
-                    <option value="paypal">PayPal</option>
-                  </select>
+          {/* User Details */}
+          <h4 className="text-lg font-semibold mb-2">Your Details</h4>
+          <div className="grid grid-cols-1 gap-2 mb-8 text-left">
+            <div className="text-sm text-gray-600">Full name</div>
+            <div className="font-medium text-lg">{contactName || user.name || '—'}</div>
 
-                  <button
-                    onClick={() => handleDonate(c.id)}
-                    disabled={loadingId === c.id}
-                    className={`w-full text-white py-2 rounded-lg text-lg ${
-                      loadingId === c.id
-                        ? "bg-indigo-400"
-                        : "bg-indigo-600 hover:bg-indigo-700"
-                    } transition`}
-                  >
-                    {loadingId === c.id ? "Processing..." : "Donate Now"}
-                  </button>
-                </div>
+            <div className="mt-3 text-sm text-gray-600">Phone number</div>
+            <div className="font-medium text-lg">{contactPhone || user.phone || '—'}</div>
+
+            <div className="mt-3 text-sm text-gray-600">Email address</div>
+            <div className="font-medium text-lg">{contactEmail || user.email || '—'}</div>
+          </div>
+
+          {/* Payment Method */}
+          <h4 className="text-lg font-semibold mb-3">Payment Method</h4>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {["gcash", "maya", "card"].map((method) => (
+              <div
+                key={method}
+                onClick={() => setPaymentMethod(method)}
+                className={`p-6 border rounded text-center cursor-pointer ${
+                  paymentMethod === method ? "ring-2 ring-weave-red" : ""
+                }`}
+              >
+                {method === "gcash" && "Gcash"}
+                {method === "maya" && "Maya"}
+                {method === "card" && "Credit Card"}
               </div>
+            ))}
+          </div>
+
+          {paymentMethod === "gcash" && (
+            <div className="mb-8">
+              <label className="block mb-2 text-sm">Gcash Phone Number</label>
+              <input className="w-full border rounded px-4 py-3" />
             </div>
-          ))}
+          )}
+
+          {/* Donate Now Button */}
+          <div className="text-center">
+            <button
+              onClick={handleDonate}
+              disabled={loading}
+              className="px-12 py-4 rounded-full bg-weave-red text-white"
+            >
+              {loading ? "Processing..." : "Donate Now"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
