@@ -22,7 +22,7 @@ export default function AdminCampaigns(){
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Manage Campaigns</h1>
-        <div><button onClick={openAdd} className="btn-primary">Add Campaign</button></div>
+  <div><button onClick={openAdd} className="btn-primary">Add Campaign</button></div>
       </div>
       <div className="bg-white rounded shadow overflow-hidden">
         {loading ? <div className="p-4">Loading...</div> : (
@@ -31,6 +31,7 @@ export default function AdminCampaigns(){
               <tr>
                 <th className="px-3 py-2 text-center">ID</th>
                 <th className="px-3 py-2 text-left">Title</th>
+                <th className="px-3 py-2 text-left">Description</th>
                 <th className="px-3 py-2 text-center">Target</th>
                 <th className="px-3 py-2 text-center">Raised</th>
                 <th className="px-3 py-2 text-center">Actions</th>
@@ -51,19 +52,20 @@ export default function AdminCampaigns(){
                   <tr key={c.id} className="border-t hover:bg-gray-50">
                     <td className="px-3 py-2 text-center">{c.id}</td>
                     <td className="px-3 py-2 max-w-[250px] whitespace-normal break-words">{c.title}</td>
+                    <td className="px-3 py-2 max-w-[350px] whitespace-normal break-words text-sm text-gray-600">{c.description ? (c.description.length > 120 ? c.description.slice(0,120) + '…' : c.description) : '-'}</td>
                     <td className="px-3 py-2 text-center">₱{c.donationTarget}</td>
                     <td className="px-3 py-2 text-center">₱{c.raisedAmount}</td>
                     <td className="px-3 py-2">
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => openEdit(c)}
-                          className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition"
+                          className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => deleteCampaign(c.id)}
-                          className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
+                          className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Delete
                         </button>
@@ -80,92 +82,63 @@ export default function AdminCampaigns(){
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           {/* Background Blur Overlay */}
-          <div 
-            className="absolute inset-0 backdrop-blur-md bg-white/20" 
-            onClick={() => setModalOpen(false)} 
-          />
+          <div className="absolute inset-0 backdrop-blur-md bg-white/20" onClick={() => setModalOpen(false)} />
 
           {/* Modal Content */}
           <div className="relative bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl p-8 border border-white/40">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
-                {editingId ? 'Edit Campaign' : 'Add Campaign'}
-              </h2>
-              <button 
-                onClick={() => setModalOpen(false)} 
-                className="text-gray-500 hover:text-gray-800 text-xl"
-              >
-                ✕
-              </button>
+              <h2 className="text-2xl font-bold text-gray-800">{editingId ? 'Edit Campaign' : 'Add Campaign'}</h2>
+              <button onClick={() => setModalOpen(false)} className="text-gray-500 hover:text-gray-800 text-xl">✕</button>
             </div>
 
             <form onSubmit={submitForm} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
-                <input 
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  placeholder="Campaign Title" 
-                  value={form.title} 
-                  onChange={e=>setForm({...form,title:e.target.value})} 
-                  required 
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 ring-accent outline-none transition"
+                  placeholder="Campaign Title"
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
+                  required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Target Amount
-                  </label>
-                  <input 
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Target Amount</label>
+                  <input
                     type="number"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                    placeholder="₱0.00" 
-                    value={form.donationTarget} 
-                    onChange={e=>setForm({...form,donationTarget:e.target.value})} 
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 ring-accent outline-none transition"
+                    placeholder="₱0.00"
+                    value={form.donationTarget}
+                    onChange={e => setForm({ ...form, donationTarget: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Image URL
-                  </label>
-                  <input 
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                    placeholder="https://example.com/image.jpg" 
-                    value={form.image} 
-                    onChange={e=>setForm({...form,image:e.target.value})} 
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                  <input
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 ring-accent outline-none transition"
+                    placeholder="https://example.com/image.jpg"
+                    value={form.image}
+                    onChange={e => setForm({ ...form, image: e.target.value })}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea 
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
                   rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 ring-accent outline-none transition resize-none"
                   placeholder="Write a short description..."
-                  value={form.description} 
-                  onChange={e=>setForm({...form,description:e.target.value})} 
+                  value={form.description}
+                  onChange={e => setForm({ ...form, description: e.target.value })}
                 />
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
-                <button 
-                  type="button" 
-                  onClick={() => setModalOpen(false)} 
-                  className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 shadow transition"
-                >
-                  {editingId ? 'Save' : 'Add Campaign'}
-                </button>
+                <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-lg bg-primary text-white font-medium bg-primary-hover shadow transition">{editingId ? 'Save' : 'Add Campaign'}</button>
               </div>
             </form>
           </div>

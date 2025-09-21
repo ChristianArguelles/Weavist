@@ -95,15 +95,21 @@ export default function SupportWeavers() {
     <div>
       <div className="container py-12 text-center">
         <h1 className="text-4xl font-bold">Empowering Our Weavers</h1>
-        <p className="mt-4 max-w-2xl mx-auto text-gray-600">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-        </p>
+        <p className="mt-4 max-w-2xl mx-auto text-gray-600">Support indigenous weaving communities by contributing to ongoing campaigns that fund materials, training, and fair wages.</p>
       </div>
 
       <div className="container py-8">
         <h2 className="text-3xl font-bold mb-6 text-center">Our Campaign</h2>
-        <div className="max-w-3xl mx-auto mb-8 text-center text-gray-600">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+        <div className="max-w-3xl mx-auto mb-8 text-center text-gray-700">
+          {campaigns[0] ? (
+            <div>
+              <h3 className="text-xl font-semibold">{campaigns[0].title}</h3>
+              <p className="mt-2 text-gray-600">{campaigns[0].description || 'Help provide resources and support to weavers in need.'}</p>
+              <div className="mt-3 text-sm text-gray-500">Raised: ₱{campaigns[0].raisedAmount || 0}</div>
+            </div>
+          ) : (
+            <p className="text-gray-600">No active campaigns at the moment. Check back soon.</p>
+          )}
         </div>
 
         <div className="border-t"></div>
@@ -116,8 +122,10 @@ export default function SupportWeavers() {
               <button
                 key={amt}
                 onClick={() => setSelectedAmount(amt)}
-                className={`px-6 py-3 rounded-full border ${
-                  selectedAmount === amt ? "bg-weave-red text-white" : ""
+                className={`px-6 py-3 rounded-full border transition-colors ${
+                  selectedAmount === amt
+                    ? "bg-accent text-white border-accent"
+                    : "bg-white text-gray-800 border-gray-400 hover:bg-gray-100"
                 }`}
               >
                 ₱ {amt}
@@ -125,8 +133,10 @@ export default function SupportWeavers() {
             ))}
             <button
               onClick={() => setSelectedAmount("custom")}
-              className={`px-6 py-3 rounded-full border ${
-                selectedAmount === "custom" ? "bg-weave-red text-white" : ""
+              className={`px-6 py-3 rounded-full border transition-colors ${
+                selectedAmount === "custom"
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white text-gray-800 border-gray-400 hover:bg-gray-100"
               }`}
             >
               Custom
@@ -147,13 +157,13 @@ export default function SupportWeavers() {
           <h4 className="text-lg font-semibold mb-2">Your Details</h4>
           <div className="grid grid-cols-1 gap-2 mb-8 text-left">
             <div className="text-sm text-gray-600">Full name</div>
-            <div className="font-medium text-lg">{contactName || user.name || '—'}</div>
+            <div className="font-medium text-lg">{contactName || user.name || "—"}</div>
 
             <div className="mt-3 text-sm text-gray-600">Phone number</div>
-            <div className="font-medium text-lg">{contactPhone || user.phone || '—'}</div>
+            <div className="font-medium text-lg">{contactPhone || user.phone || "—"}</div>
 
             <div className="mt-3 text-sm text-gray-600">Email address</div>
-            <div className="font-medium text-lg">{contactEmail || user.email || '—'}</div>
+            <div className="font-medium text-lg">{contactEmail || user.email || "—"}</div>
           </div>
 
           {/* Payment Method */}
@@ -163,8 +173,10 @@ export default function SupportWeavers() {
               <div
                 key={method}
                 onClick={() => setPaymentMethod(method)}
-                className={`p-6 border rounded text-center cursor-pointer ${
-                  paymentMethod === method ? "ring-2 ring-weave-red" : ""
+                className={`p-6 border rounded text-center cursor-pointer transition-colors ${
+                  paymentMethod === method
+                    ? "bg-accent text-white border-accent"
+                    : "bg-white text-gray-800 border-gray-400 hover:bg-gray-100"
                 }`}
               >
                 {method === "gcash" && "Gcash"}
@@ -186,7 +198,7 @@ export default function SupportWeavers() {
             <button
               onClick={handleDonate}
               disabled={loading}
-              className="px-12 py-4 rounded-full bg-weave-red text-white"
+              className="px-12 py-4 rounded-full bg-primary text-white bg-primary-hover"
             >
               {loading ? "Processing..." : "Donate Now"}
             </button>

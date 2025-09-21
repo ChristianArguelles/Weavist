@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { api } from '../api/client';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
@@ -9,6 +10,22 @@ export default function Checkout() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false); // ✅ new state
   const nav = useNavigate();
+  const { user } = useAuth();
+
+  // shipping fields
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [editable, setEditable] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+
+  useEffect(()=>{
+    if(user){
+      setName(user.name || '');
+      setPhone(user.phone || user.phone_number || '');
+      setAddress(user.address || '');
+    }
+  },[user]);
 
   const placeOrder = async () => {
     setLoading(true);
@@ -22,6 +39,12 @@ export default function Checkout() {
           quantity: i.quantity,
         })),
         totalAmount: subtotal,
+        shipping: {
+          name: name,
+          phone: phone,
+          address: address,
+        },
+        paymentMethod: paymentMethod,
       };
       await api.post('/orders', payload);
 
@@ -61,24 +84,27 @@ export default function Checkout() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="card p-6">
-            <h2 className="font-semibold mb-4">Shipping Information</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold mb-2">Shipping Information</h2>
+              <button onClick={()=>setEditable(!editable)} className="text-sm text-primary">{editable ? 'Lock' : 'Edit'}</button>
+            </div>
             <div className="grid grid-cols-1 gap-3">
               <label className="text-sm font-medium">Full Name</label>
-              <input className="w-full border rounded px-3 py-2" placeholder="Full name" />
+              <input className="w-full border rounded px-3 py-2" placeholder="Full name" value={name} onChange={e=>setName(e.target.value)} disabled={!editable} />
 
               <label className="text-sm font-medium">Phone Number</label>
-              <input className="w-full border rounded px-3 py-2" placeholder="Phone" />
+              <input className="w-full border rounded px-3 py-2" placeholder="Phone" value={phone} onChange={e=>setPhone(e.target.value)} disabled={!editable} />
 
               <label className="text-sm font-medium">Address</label>
-              <textarea className="w-full border rounded px-3 py-2 h-32" placeholder="Address" />
+              <textarea className="w-full border rounded px-3 py-2 h-32" placeholder="Address" value={address} onChange={e=>setAddress(e.target.value)} disabled={!editable} />
             </div>
           </div>
 
           <div className="mt-6 card p-6">
             <h3 className="font-semibold mb-3">Choose Payment Method</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-6 border rounded shadow-sm text-center">Cash on Delivery</div>
-              <div className="p-6 border rounded shadow-sm text-center">Credit Card</div>
+              <button type="button" onClick={()=>setPaymentMethod('cod')} className={`p-6 border rounded shadow-sm text-center ${paymentMethod==='cod' ? 'border-accent ring-accent' : ''}`}>Cash on Delivery</button>
+              <button type="button" onClick={()=>setPaymentMethod('card')} className={`p-6 border rounded shadow-sm text-center ${paymentMethod==='card' ? 'border-accent ring-accent' : ''}`}>Credit Card</button>
             </div>
             <div className="mt-4 flex gap-4">
               <button onClick={()=>nav('/cart')} className="btn-muted flex-1">Back to Cart</button>

@@ -27,7 +27,7 @@ export default function Cart(){
                   <button onClick={()=>updateQuantity(it.product.id, Math.max(1, it.quantity-1))} className="px-3 py-2 border rounded">-</button>
                   <div className="px-4 py-2 border rounded">{it.quantity}</div>
                   <button onClick={()=>updateQuantity(it.product.id, it.quantity+1)} className="px-3 py-2 border rounded">+</button>
-                  <button onClick={()=>removeItem(it.product.id)} className="text-red-600 ml-4" aria-label="Remove item" title="Remove item">
+                  <button onClick={()=>removeItem(it.product.id)} className="text-primary ml-4" aria-label="Remove item" title="Remove item">
                     <svg aria-hidden="true" className="w-5 h-5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 7h12M9 7v10a2 2 0 002 2h2a2 2 0 002-2V7M10 11v6M14 11v6M9 7L9 5a1 1 0 011-1h4a1 1 0 011 1v2" />
                     </svg>
@@ -46,7 +46,7 @@ export default function Cart(){
             <div className="mt-4">
               <button onClick={()=>nav('/checkout')} className="btn-primary w-full">Proceed to Checkout</button>
             </div>
-            <div className="mt-3 text-sm text-gray-500"><button onClick={()=>clearCart()} className="text-red-600">Clear cart</button></div>
+            <div className="mt-3 text-sm text-gray-500"><button onClick={()=>clearCart()} className="text-primary">Clear cart</button></div>
           </aside>
         </div>
       )}

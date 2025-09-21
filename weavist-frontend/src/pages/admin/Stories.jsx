@@ -91,13 +91,13 @@ export default function AdminStories() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEdit(s)}
-                          className="bg-blue-600 text-white px-2 py-1 rounded"
+                          className="bg-primary text-white px-2 py-1 rounded"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => deleteStory(s.id)}
-                          className="bg-red-600 text-white px-2 py-1 rounded"
+                          className="bg-primary text-white px-2 py-1 rounded"
                         >
                           Delete
                         </button>
@@ -141,7 +141,7 @@ export default function AdminStories() {
                   Story Title
                 </label>
                 <input
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                   placeholder="Enter story title"
                   value={form.storyTitle}
                   onChange={(e) => setForm({ ...form, storyTitle: e.target.value })}
@@ -155,7 +155,7 @@ export default function AdminStories() {
                   Image URL
                 </label>
                 <input
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                   placeholder="Paste image link"
                   value={form.media}
                   onChange={(e) => setForm({ ...form, media: e.target.value })}
@@ -175,7 +175,7 @@ export default function AdminStories() {
                   Video URL
                 </label>
                 <input
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                   placeholder="YouTube link or /videos/story1.mp4"
                   value={form.video}
                   onChange={(e) => setForm({ ...form, video: e.target.value })}
@@ -195,7 +195,7 @@ export default function AdminStories() {
                   Content
                 </label>
                 <textarea
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                   placeholder="Write the story content..."
                   rows={4}
                   value={form.content}
@@ -214,7 +214,7 @@ export default function AdminStories() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+                  className="px-4 py-2 bg-primary text-white rounded-lg shadow bg-primary-hover transition"
                 >
                   {editingId ? 'Save Changes' : 'Add Story'}
                 </button>

@@ -1,8 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
 
 export default function Home() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [stories, setStories] = useState([]);
+
+  useEffect(()=>{ fetchHighlights(); },[]);
+
+  async function fetchHighlights(){
+    try {
+      // Request up to 6 highlights from the API. Use slice as a safety net in case the API
+      // returns more items than requested.
+      const pRes = await api.get('/products?limit=6');
+      const pData = Array.isArray(pRes.data) ? pRes.data : pRes.data.data || [];
+      setProducts(pData.slice(0, 6));
+    } catch(e){ console.error('fetch products', e); }
+    try {
+      const sRes = await api.get('/stories?limit=6');
+      const sData = Array.isArray(sRes.data) ? sRes.data : sRes.data.data || [];
+      setStories(sData.slice(0, 6));
+    } catch(e){ console.error('fetch stories', e); }
+  }
+
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -14,81 +35,98 @@ export default function Home() {
       >
         <div className="bg-black/50 absolute inset-0"></div>
         <div className="relative z-10 px-4">
-          <h1 className="text-4xl font-bold mb-4">
-            Weaving Stories, Preserving Culture
-          </h1>
-          <p className="max-w-2xl mx-auto mb-6">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
+          <h1 className="text-4xl font-bold mb-4">Weaving Stories, Preserving Culture</h1>
+          <p className="max-w-2xl mx-auto mb-6 text-gray-100">Discover handcrafted pieces and read the stories behind the weavers. Support artisans by shopping ethically and contributing to campaigns that sustain traditional craft.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button onClick={() => navigate('/shop')} className="bg-[#5c1e1e] hover:bg-[#7a2a2a] text-white px-5 py-2 rounded-full">
-              Shop Now
-            </button>
-            <button onClick={() => navigate('/stories')} className="bg-[#5c1e1e] hover:bg-[#7a2a2a] text-white px-5 py-2 rounded-full">
-              Explore Stories
-            </button>
-            <button onClick={() => navigate('/support')} className="bg-[#5c1e1e] hover:bg-[#7a2a2a] text-white px-5 py-2 rounded-full">
-              Support Weavers
-            </button>
+            <button onClick={() => navigate('/shop')} className="bg-primary bg-primary-hover text-white px-5 py-2 rounded-full">Shop Now</button>
+            <button onClick={() => navigate('/stories')} className="bg-primary bg-primary-hover text-white px-5 py-2 rounded-full">Explore Stories</button>
+            <button onClick={() => navigate('/support')} className="bg-primary bg-primary-hover text-white px-5 py-2 rounded-full">Support Weavers</button>
           </div>
         </div>
       </div>
 
       {/* Product Highlight */}
       <section className="py-12 text-center">
-        <h2 className="text-2xl font-bold text-[#5c1e1e] mb-8">
-          Product Highlight
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 px-6">
-          {[...Array(5)].map((_, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-200 h-64 rounded-lg flex flex-col justify-end items-center p-4"
-            >
-              {/* Placeholder for image from DB */}
-              <button className="bg-[#5c1e1e] hover:bg-[#7a2a2a] text-white px-4 py-2 rounded-full">
-                View in Shop
-              </button>
-            </div>
-          ))}
+        <h2 className="text-2xl font-bold text-primary mb-4">Product Highlight</h2>
+        {products.length === 0 ? (
+          <div className="text-gray-600 mb-6">No products available at the moment.</div>
+        ) : (
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4">
+            {products.map(p => (
+              <div
+                key={p.id}
+                className="bg-white rounded-lg shadow p-4 flex flex-col justify-between"
+              >
+                <div className="h-40 bg-gray-100 rounded overflow-hidden mb-3">
+                  {p.image && (
+                    <img
+                      src={p.image}
+                      alt={p.productName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold break-words whitespace-normal max-w-full">
+                    {p.productName}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {p.description
+                      ? p.description.length > 80
+                        ? p.description.slice(0, 77) + "…"
+                        : p.description
+                      : ""}
+                  </div>
+                </div>
+                <div className="mt-3 flex justify-between items-center">
+                  <div className="font-semibold">
+                    ₱{Number(p.productPrice).toFixed(2)}
+                  </div>
+                  <button
+                    onClick={() => navigate("/shop")}
+                    className="bg-primary text-white px-3 py-1 rounded"
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="mt-6">
+          <button
+            onClick={() => navigate("/shop")}
+            className="text-sm text-accent hover:underline"
+          >
+            View more products
+          </button>
         </div>
       </section>
 
-      {/* Explore More */}
+      {/* Stories Highlight */}
       <section className="py-12 border-t text-center">
-        <h2 className="text-2xl font-bold text-[#5c1e1e] mb-8">Explore More</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
-          {[...Array(3)].map((_, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-200 rounded-lg p-6 flex flex-col justify-between"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  Icon
-                </div>
-                <h3 className="font-bold text-lg">Digital Storytelling</h3>
+  <h2 className="text-2xl font-bold text-primary mb-4">Stories Highlight</h2>
+        {stories.length === 0 ? (
+          <div className="text-gray-600 mb-6">No stories available at the moment.</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-6">
+            {stories.map(s => (
+              <div key={s.id} className="bg-white rounded-lg p-6 text-left shadow">
+                <h3 className="font-semibold mb-2 break-words whitespace-normal max-w-full">{s.storyTitle}</h3>
+                <p className="text-sm text-gray-600">{s.content ? (s.content.length>140? s.content.slice(0,137)+'…' : s.content) : ''}</p>
+                <div className="mt-4"><button onClick={()=>navigate('/stories')} className="text-sm text-accent hover:underline">View more</button></div>
               </div>
-              <p className="text-gray-700 mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-              <button className="bg-[#5c1e1e] hover:bg-[#7a2a2a] text-white px-4 py-2 rounded-full">
-                Explore Now
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+  <div className="mt-6"><button onClick={()=>navigate('/stories')} className="text-sm text-accent hover:underline">View more stories</button></div>
       </section>
 
       {/* Footer */}
       <footer className="bg-white border-t mt-12">
         <div className="container py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h4 className="font-bold text-lg text-[#5c1e1e] mb-3">Weavist</h4>
+            <h4 className="font-bold text-lg text-primary mb-3">Weavist</h4>
             <p className="text-gray-600">Connecting you with indigenous weavers. Quality handcrafts, fair trade.</p>
           </div>
 
@@ -107,7 +145,7 @@ export default function Home() {
             <p className="text-gray-600 mb-3">Subscribe for updates and new collections.</p>
             <div className="flex gap-2">
               <input placeholder="Email address" className="border rounded-l px-3 py-2 w-full" />
-              <button className="bg-[#5c1e1e] text-white px-4 py-2 rounded-r">Subscribe</button>
+              <button className="bg-primary text-white px-4 py-2 rounded-r">Subscribe</button>
             </div>
             <div className="flex gap-3 mt-4">
               <a className="p-2 rounded-full border text-gray-700" aria-label="Website link" title="Website link">

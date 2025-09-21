@@ -35,12 +35,12 @@ export default function Login(){
 
         <form onSubmit={submit} className="flex flex-col gap-4">
           <label className="text-sm text-gray-700">Email</label>
-          <input className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-red-200" placeholder="you@domain.com" value={email} onChange={e=>setEmail(e.target.value)} />
+          <input className="w-full border rounded-md px-3 py-2 focus:ring-2 ring-accent" placeholder="you@domain.com" value={email} onChange={e=>setEmail(e.target.value)} />
 
           <label className="text-sm text-gray-700">Password</label>
-          <input type="password" className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-red-200" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} />
+          <input type="password" className="w-full border rounded-md px-3 py-2 focus:ring-2 ring-accent" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} />
 
-          {error && <div className="text-red-600">{error}</div>}
+          {error && <div className="text-primary">{error}</div>}
 
           <button className="btn-primary w-full" disabled={loading}>{loading ? 'Logging in...' : 'Sign in'}</button>
         </form>

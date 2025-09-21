@@ -66,7 +66,7 @@ export default function Navbar(){
                     <button
                       role="menuitem"
                       onClick={() => { setUserMenuOpen(false); logout(); window.location = '/'; }}
-                      className="w-full text-left px-3 py-2 hover:bg-gray-100 text-red-600"
+                      className="w-full text-left px-3 py-2 hover:bg-gray-100 text-primary"
                     >
                       Logout
                     </button>
@@ -139,7 +139,7 @@ export default function Navbar(){
                           <Link to="/admin" onClick={()=>setOpen(false)}>Admin Dashboard</Link>
                         )}
                 <Link to="/profile" onClick={()=>{ setOpen(false); setUserMenuOpen(false); }}>Profile</Link>
-                <button onClick={()=>{ logout(); window.location='/'; }} className="text-left text-red-600">Logout</button>
+                <button onClick={()=>{ logout(); window.location='/'; }} className="text-left text-primary">Logout</button>
               </>
             ) : (
               <>

@@ -35,7 +35,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="container py-8 text-center text-red-600">
+      <div className="container py-8 text-center text-primary">
         Product not found.
       </div>
     );
@@ -43,6 +43,14 @@ export default function ProductDetail() {
 
   return (
     <div className="container py-8">
+      {/* Back button */}
+      <button
+        onClick={() => navigate("/shop")}
+        className="mb-6 text-m text-primary hover:underline font-bold"
+      >
+        ← Back to Shop
+      </button>
+
       <div className="card overflow-hidden grid md:grid-cols-2 gap-6">
         {/* Image Section */}
         <div>
@@ -90,7 +98,7 @@ export default function ProductDetail() {
                 navigate("/checkout");
               }}
               className="flex-1 bg-weave-deep text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
-              style={{ backgroundColor: 'var(--weave-deep)' }}
+              style={{ backgroundColor: "var(--weave-deep)" }}
             >
               Buy Now
             </button>

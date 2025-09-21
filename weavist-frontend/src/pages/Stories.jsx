@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../api/client";
 
 function VideoEmbed({ url, title }) {
   if (!url) return null;
-  if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const embed = url.includes('watch?v=') ? url.replace('watch?v=', 'embed/') : url;
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
+    const embed = url.includes("watch?v=")
+      ? url.replace("watch?v=", "embed/")
+      : url;
     return (
       <div className="mt-3">
         <iframe
@@ -17,7 +20,7 @@ function VideoEmbed({ url, title }) {
       </div>
     );
   }
-  if (url.endsWith('.mp4')) {
+  if (url.endsWith(".mp4")) {
     return (
       <video controls className="w-full mt-3 rounded">
         <source src={url} type="video/mp4" />
@@ -29,6 +32,7 @@ function VideoEmbed({ url, title }) {
 }
 
 export default function Stories() {
+  const navigate = useNavigate();
   const [stories, setStories] = useState([]);
 
   useEffect(() => {
@@ -37,76 +41,128 @@ export default function Stories() {
 
   async function fetchStories() {
     try {
-      const res = await api.get('/stories');
-      setStories(Array.isArray(res.data) ? res.data : (res.data.data || res.data));
+      const res = await api.get("/stories");
+      setStories(
+        Array.isArray(res.data) ? res.data : res.data.data || res.data
+      );
     } catch (e) {
       console.error(e);
     }
   }
 
   return (
-    <div>
+    <div className="w-full">
       {/* Intro Section */}
       <div className="bg-white py-12">
         <div className="container text-center">
           <h1 className="text-4xl font-bold">Explore the Stories of Weaving</h1>
           <p className="mt-4 max-w-2xl mx-auto text-gray-600">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </p>
-          <p className="mt-2 max-w-2xl mx-auto text-gray-600">
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Discover how each creation reflects the artistry of local weavers
+            and learn about the communities that keep this heritage alive
+            through dedication, creativity, and heart.
           </p>
         </div>
       </div>
 
       {/* Articles Section */}
-      <div className="container py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">Articles</h2>
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {stories.map((s) => (
-            <div key={s.id} className="relative rounded-lg overflow-hidden shadow-md">
-              {s.media && (
-                <img
-                  src={s.media}
-                  className="w-full h-56 object-cover"
-                  alt={s.storyTitle}
-                />
-              )}
-              <div className="absolute bottom-4 left-0 w-full flex justify-center">
-                <button className="bg-[#6b1c1c] text-white px-6 py-2 rounded">
-                  Read More
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Watch Section */}
-        <h2 className="text-2xl font-bold mb-6 text-center">Watch the Beauty of Weaving</h2>
-        <div className="grid md:grid-cols-2 gap-12">
-          {stories.filter((s) => s.video).map((s) => (
-            <div key={s.id} className="flex gap-6 items-center">
-              <div className="flex-shrink-0 w-48">
+      <section className="py-12 text-center">
+        <h2 className="text-2xl font-bold text-primary mb-6">Articles</h2>
+        {stories.length === 0 ? (
+          <div className="text-gray-600 mb-6">
+            No stories available at the moment.
+          </div>
+        ) : (
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+            {stories.map((s) => (
+              <div
+                key={s.id}
+                className="bg-white rounded-lg shadow p-4 flex flex-col"
+              >
                 {s.media && (
-                  <img
-                    src={s.media}
-                    className="w-full h-32 object-cover rounded"
-                    alt={s.storyTitle}
-                  />
+                  <div className="h-40 bg-gray-100 rounded overflow-hidden mb-3">
+                    <img
+                      src={s.media}
+                      alt={s.storyTitle}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 )}
+                <h3 className="font-semibold text-lg mb-2 text-left break-words">
+                  {s.storyTitle}
+                </h3>
+                <p className="text-sm text-gray-600 text-left">
+                  {s.content
+                    ? s.content.length > 100
+                      ? s.content.slice(0, 97) + "…"
+                      : s.content
+                    : ""}
+                </p>
+                {/* Button pinned bottom-right */}
+                <div className="mt-auto self-end">
+                  <button
+                    onClick={() => navigate(`/stories/${s.id}`)}
+                    className="bg-primary text-white px-4 py-2 rounded"
+                  >
+                    Read More
+                  </button>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-xl">{s.storyTitle}</h3>
-                <p className="text-gray-600 mt-2">{s.content?.slice(0, 120)}...</p>
-                <button className="mt-4 bg-[#6b1c1c] text-white px-6 py-2 rounded">
-                  Watch Now
-                </button>
-                <VideoEmbed url={s.video} title={s.storyTitle} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Watch Section */}
+      <section className="py-12 border-t text-center">
+        <h2 className="text-2xl font-bold text-primary mb-6">
+          Watch the Beauty of Weaving
+        </h2>
+        {stories.filter((s) => s.video).length === 0 ? (
+          <div className="text-gray-600 mb-6">
+            No videos available at the moment.
+          </div>
+        ) : (
+          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+            {stories
+              .filter((s) => s.video)
+              .map((s) => (
+                <div
+                  key={s.id}
+                  className="bg-white rounded-lg shadow p-4 flex flex-col"
+                >
+                  {s.media && (
+                    <div className="h-32 bg-gray-100 rounded overflow-hidden mb-3">
+                      <img
+                        src={s.media}
+                        alt={s.storyTitle}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <h3 className="font-semibold text-lg mb-2 text-left break-words">
+                    {s.storyTitle}
+                  </h3>
+                  <p className="text-sm text-gray-600 text-left">
+                    {s.content
+                      ? s.content.length > 120
+                        ? s.content.slice(0, 117) + "…"
+                        : s.content
+                      : ""}
+                  </p>
+                  <VideoEmbed url={s.video} title={s.storyTitle} />
+                  {/* <div className="mt-6 mt-auto self-end">
+                    <button
+                      onClick={() => navigate(`/stories/${s.id}`)}
+                      className="bg-primary text-white px-4 py-2 rounded"
+                    >
+                      Watch Now
+                    </button>
+                  </div> */}
+                </div>
+              ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

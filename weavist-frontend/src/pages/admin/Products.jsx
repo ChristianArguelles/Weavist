@@ -67,13 +67,13 @@ export default function AdminProducts(){
                       <div className="flex justify-center gap-2">
                         <button 
                           onClick={()=>openEdit(p)} 
-                          className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition"
+                          className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={()=>deleteProduct(p.id)} 
-                          className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
+                          className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Delete
                         </button>
@@ -119,7 +119,7 @@ export default function AdminProducts(){
                   value={form.productName}
                   onChange={(e) => setForm({ ...form, productName: e.target.value })}
                   placeholder="Enter product name"
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                   required
                 />
               </div>
@@ -137,7 +137,7 @@ export default function AdminProducts(){
                       setForm({ ...form, productPrice: e.target.value })
                     }
                     placeholder="0.00"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                     required
                   />
                 </div>
@@ -150,7 +150,7 @@ export default function AdminProducts(){
                     value={form.stock}
                     onChange={(e) => setForm({ ...form, stock: e.target.value })}
                     placeholder="0"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                     required
                   />
                 </div>
@@ -165,7 +165,7 @@ export default function AdminProducts(){
                   value={form.image}
                   onChange={(e) => setForm({ ...form, image: e.target.value })}
                   placeholder="Paste image link"
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                 />
                 {form.image && (
                   <img
@@ -188,7 +188,7 @@ export default function AdminProducts(){
                   }
                   placeholder="Write a short description..."
                   rows={3}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 ring-accent focus:outline-none"
                 />
               </div>
 
@@ -203,7 +203,7 @@ export default function AdminProducts(){
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+                  className="px-4 py-2 bg-primary text-white rounded-lg shadow bg-primary-hover transition"
                 >
                   {editingId ? 'Save Changes' : 'Create Product'}
                 </button>

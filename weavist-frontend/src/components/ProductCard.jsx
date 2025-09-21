@@ -20,7 +20,7 @@ export default function ProductCard({ product, onAdd }) {
       {/* Info */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold break-words whitespace-normal">
             {product.productName || product.name}
           </h3>
           <div className="text-weave-red font-bold">
@@ -32,11 +32,14 @@ export default function ProductCard({ product, onAdd }) {
         <div className="mt-3 flex flex-col gap-2">
           <Link
             to={`/product/${product.id}`}
-            className="btn-muted w-full text-center"
+            className="btn-primary w-full text-center"
           >
             View Details
           </Link>
-          <button onClick={() => onAdd(product)} className="btn-primary w-full">
+          <button 
+            onClick={() => onAdd(product)} 
+            className="btn-primary w-full"
+          >
             Add to Cart
           </button>
         </div>

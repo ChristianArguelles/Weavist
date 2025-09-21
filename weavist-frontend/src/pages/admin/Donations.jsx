@@ -25,7 +25,7 @@ export default function AdminDonations(){
                   <td className="px-3 py-2">{d.campaign?.title}</td>
                   <td className="px-3 py-2">₱{d.amount}</td>
                   <td className="px-3 py-2">{new Date(d.created_at).toLocaleString()}</td>
-                  <td className="px-3 py-2"><button onClick={()=>deleteDonation(d.id)} className="bg-red-600 text-white px-2 py-1 rounded">Delete</button></td>
+                  <td className="px-3 py-2"><button onClick={()=>deleteDonation(d.id)} className="bg-primary text-white px-2 py-1 rounded">Delete</button></td>
                 </tr>
               ))}
             </tbody>
