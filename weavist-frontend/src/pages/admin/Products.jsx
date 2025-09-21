@@ -39,6 +39,7 @@ export default function AdminProducts(){
               <tr>
                 <th className="px-3 py-2 text-center">ID</th>
                 <th className="px-3 py-2 text-left">Name</th>
+                <th className="px-3 py-2 text-left">Description</th>
                 <th className="px-3 py-2 text-center">Price</th>
                 <th className="px-3 py-2 text-center">Stock</th>
                 <th className="px-3 py-2 text-center">Actions</th>
@@ -48,31 +49,36 @@ export default function AdminProducts(){
               {products.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-3 py-6 text-center text-gray-500 italic"
                   >
                     No products found.
                   </td>
                 </tr>
               ) : (
-                products.map(p => (
+                products.map((p) => (
                   <tr key={p.id} className="border-t hover:bg-gray-50">
                     <td className="px-3 py-2 text-center">{p.id}</td>
-                    <td className="px-3 py-2 max-w-[200px] whitespace-normal break-words">{p.productName}</td>
+                    <td className="px-3 py-2 max-w-[200px] whitespace-normal break-words">
+                      {p.productName}
+                    </td>
+                    <td className="px-3 py-2 max-w-[300px] whitespace-normal break-words text-gray-600">
+                      {p.description || "—"}
+                    </td>
                     <td className="px-3 py-2 text-center">
                       ₱{Number(p.productPrice).toFixed(2)}
                     </td>
                     <td className="px-3 py-2 text-center">{p.stock}</td>
                     <td className="px-3 py-2">
                       <div className="flex justify-center gap-2">
-                        <button 
-                          onClick={()=>openEdit(p)} 
+                        <button
+                          onClick={() => openEdit(p)}
                           className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Edit
                         </button>
-                        <button 
-                          onClick={()=>deleteProduct(p.id)} 
+                        <button
+                          onClick={() => deleteProduct(p.id)}
                           className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
                         >
                           Delete

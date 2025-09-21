@@ -101,7 +101,7 @@ export default function Stories() {
                 <div className="mt-auto self-end">
                   <button
                     onClick={() => navigate(`/stories/${s.id}`)}
-                    className="bg-primary text-white px-4 py-2 rounded"
+                    className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition"
                   >
                     Read More
                   </button>
@@ -113,51 +113,41 @@ export default function Stories() {
       </section>
 
       {/* Watch Section */}
-      <section className="py-12 border-t text-center">
-        <h2 className="text-2xl font-bold text-primary mb-6">
+      <section className="py-12 border-t">
+        <h2 className="text-2xl font-bold text-primary text-center mb-6">
           Watch the Beauty of Weaving
         </h2>
         {stories.filter((s) => s.video).length === 0 ? (
-          <div className="text-gray-600 mb-6">
+          <div className="text-gray-600 text-center mb-6">
             No videos available at the moment.
           </div>
         ) : (
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+          <div className="max-w-5xl mx-auto space-y-8 px-4">
             {stories
               .filter((s) => s.video)
               .map((s) => (
                 <div
                   key={s.id}
-                  className="bg-white rounded-lg shadow p-4 flex flex-col"
+                  className="bg-white rounded-lg shadow p-6 flex items-start gap-6"
                 >
-                  {s.media && (
-                    <div className="h-32 bg-gray-100 rounded overflow-hidden mb-3">
-                      <img
-                        src={s.media}
-                        alt={s.storyTitle}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <h3 className="font-semibold text-lg mb-2 text-left break-words">
-                    {s.storyTitle}
-                  </h3>
-                  <p className="text-sm text-gray-600 text-left">
-                    {s.content
-                      ? s.content.length > 120
-                        ? s.content.slice(0, 117) + "…"
-                        : s.content
-                      : ""}
-                  </p>
-                  <VideoEmbed url={s.video} title={s.storyTitle} />
-                  {/* <div className="mt-6 mt-auto self-end">
-                    <button
-                      onClick={() => navigate(`/stories/${s.id}`)}
-                      className="bg-primary text-white px-4 py-2 rounded"
-                    >
-                      Watch Now
-                    </button>
-                  </div> */}
+                  {/* Video (fixed size on left) */}
+                  <div className="w-1/3 min-w-[250px] rounded-lg overflow-hidden">
+                    <VideoEmbed url={s.video} title={s.storyTitle} />
+                  </div>
+
+                  {/* Text on right */}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2 break-words">
+                      {s.storyTitle}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {s.content
+                        ? s.content.length > 250
+                          ? s.content.slice(0, 247) + "…"
+                          : s.content
+                        : ""}
+                    </p>
+                  </div>
                 </div>
               ))}
           </div>

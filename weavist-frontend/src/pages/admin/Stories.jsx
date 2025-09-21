@@ -70,6 +70,7 @@ export default function AdminStories() {
               <tr>
                 <th className="px-3 py-2 text-left">ID</th>
                 <th className="px-3 py-2 text-left">Title</th>
+                <th className="px-3 py-2 text-left">Content</th>
                 <th className="px-3 py-2 text-left">Video</th>
                 <th className="px-3 py-2 text-left">Actions</th>
               </tr>
@@ -77,7 +78,7 @@ export default function AdminStories() {
             <tbody>
               {stories.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-3 py-4 text-center text-gray-500">
+                  <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
                     No stories found.
                   </td>
                 </tr>
@@ -85,7 +86,12 @@ export default function AdminStories() {
                 stories.map(s => (
                   <tr key={s.id} className="border-t">
                     <td className="px-3 py-2">{s.id}</td>
-                    <td className="px-3 py-2 max-w-[500px] whitespace-normal break-words">{s.storyTitle}</td>
+                    <td className="px-3 py-2 max-w-[200px] whitespace-normal break-words">
+                      {s.storyTitle}
+                    </td>
+                    <td className="px-3 py-2 max-w-[300px] whitespace-normal break-words text-gray-700">
+                      {s.content || '-'}
+                    </td>
                     <td className="px-3 py-2">{s.video || '-'}</td>
                     <td className="px-3 py-2">
                       <div className="flex gap-2">
