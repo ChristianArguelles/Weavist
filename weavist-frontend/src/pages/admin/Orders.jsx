@@ -4,8 +4,9 @@ import { api } from '../../api/client';
 export default function AdminOrders(){
   const [orders, setOrders] = useState([]);
 
+  const [loading, setLoading] = useState(false);
   useEffect(()=>{ fetchList(); }, []);
-  async function fetchList(){ try { const res = await api.get('/orders'); setOrders(res.data); } catch(e){ console.error(e); } }
+  async function fetchList(){ setLoading(true); try { const res = await api.get('/orders'); const sorted = (res.data||[]).slice().sort((a,b)=>a.id - b.id); setOrders(sorted); } catch(e){ console.error(e); } setLoading(false); }
 
   async function updateStatus(id, status){ try { await api.put(`/orders/${id}`, { status }); fetchList(); } catch(e){ alert(e.response?.data?.message || e.message); } }
 

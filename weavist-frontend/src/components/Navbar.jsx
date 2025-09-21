@@ -12,7 +12,6 @@ export default function Navbar(){
 
   return (
     <header className="weavist-header sticky top-0 z-50">
-      <div className="weave-border"></div>
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
         <div className="text-2xl brand-weave cursor-pointer" onClick={()=>nav('/')}>Weavist</div>
         <nav className="hidden md:flex items-center gap-6">
