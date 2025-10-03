@@ -23,6 +23,22 @@ export default function StoryDetails() {
     }
   }
 
+  function getYoutubeEmbed(url) {
+    if (!url) return null;
+    try {
+      if (url.includes("youtube.com/watch?v=")) {
+        return url.replace("watch?v=", "embed/");
+      }
+      if (url.includes("youtu.be/")) {
+        const id = url.split("youtu.be/")[1].split(/[?&]/)[0];
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   if (loading) {
     return <div className="py-20 text-center text-gray-600">Loading story...</div>;
   }
@@ -31,8 +47,13 @@ export default function StoryDetails() {
     return <div className="py-20 text-center text-red-500">Story not found</div>;
   }
 
+  const paragraphs = (story.content || "")
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-3xl mx-auto px-6 py-12">
       <button
         onClick={() => navigate(-1)}
         className="mb-6 text-primary hover:underline"
@@ -40,10 +61,12 @@ export default function StoryDetails() {
         ← Back
       </button>
 
-      <h1 className="text-3xl font-bold mb-4">{story.storyTitle}</h1>
+      <h1 className="text-4xl font-bold tracking-tight mb-2">{story.storyTitle}</h1>
+      <div className="text-sm text-gray-500 mb-6">A story from the Weavist community</div>
+      <hr className="border-gray-200 mb-8" />
 
       {story.media_url ? (
-        <div className="w-full h-64 mb-6 rounded overflow-hidden shadow">
+        <div className="w-full h-72 mb-8 rounded overflow-hidden shadow">
           <img
             src={story.media_url}
             alt={story.storyTitle}
@@ -51,14 +74,36 @@ export default function StoryDetails() {
           />
         </div>
       ) : (
-        <div className="w-full h-64 mb-6 bg-gray-100 flex items-center justify-center text-gray-400 border rounded">
+        <div className="w-full h-64 mb-8 bg-gray-100 flex items-center justify-center text-gray-400 border rounded">
           No media available
         </div>
       )}
 
-      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-        {story.content}
-      </p>
+      {getYoutubeEmbed(story.video) ? (
+        <div className="my-10">
+          <div className="relative w-full overflow-hidden rounded shadow" style={{paddingTop: '56.25%'}}>
+            <iframe
+              className="absolute top-0 left-0 w-full h-full"
+              src={getYoutubeEmbed(story.video)}
+              title={story.storyTitle}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          </div>
+          <div className="mt-3 text-sm">
+            <a href={story.video} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">Open on YouTube</a>
+          </div>
+        </div>
+      ) : null}
+
+      <article className="text-gray-800 text-lg leading-8 space-y-6">
+        {paragraphs.length > 0 ? (
+          paragraphs.map((p, idx) => <p key={idx}>{p}</p>)
+        ) : (
+          <p>{story.content}</p>
+        )}
+      </article>
     </div>
   );
 }

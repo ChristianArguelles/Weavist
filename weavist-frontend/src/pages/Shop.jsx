@@ -9,6 +9,7 @@ export default function Shop() {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({ handwoven: false, scarves: false, bags: false });
   const { addItem } = useCart();
   const navigate = useNavigate();
 
@@ -74,11 +75,48 @@ export default function Shop() {
               </button>
 
               {showFilters && (
-                <div id="shop-filters" className="absolute right-0 mt-2 w-56 bg-white border rounded shadow-md p-3 z-40">
+                <div id="shop-filters" className="absolute right-0 mt-2 w-64 bg-white border rounded shadow-md p-3 z-40">
                   <div className="text-sm font-semibold mb-2">Filters</div>
-                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" /> Handwoven</label>
-                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" /> Scarves</label>
-                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" /> Bags</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={filters.handwoven}
+                        onChange={(e) => setFilters(f => ({ ...f, handwoven: e.target.checked }))}
+                      />
+                      Handwoven
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={filters.scarves}
+                        onChange={(e) => setFilters(f => ({ ...f, scarves: e.target.checked }))}
+                      />
+                      Scarves
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={filters.bags}
+                        onChange={(e) => setFilters(f => ({ ...f, bags: e.target.checked }))}
+                      />
+                      Bags
+                    </label>
+                  </div>
+                  <div className="mt-3 flex justify-between">
+                    <button
+                      className="text-sm text-gray-600 hover:underline"
+                      onClick={() => setFilters({ handwoven: false, scarves: false, bags: false })}
+                    >
+                      Clear
+                    </button>
+                    <button
+                      className="text-sm text-primary hover:underline"
+                      onClick={() => setShowFilters(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -99,7 +137,26 @@ export default function Shop() {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.length > 0 ? (
             products
-              .filter(p => p.productName?.toLowerCase().includes((query || '').toLowerCase()))
+              .filter(p => {
+                const q = (query || '').toLowerCase();
+                const name = (p.productName || '').toLowerCase();
+                const desc = (p.description || '').toLowerCase();
+                const matchesQuery = q === '' || name.includes(q) || desc.includes(q);
+
+                // category-like filters using heuristics on productName/description
+                const isScarf = name.includes('scarf') || desc.includes('scarf');
+                const isBag = name.includes('bag') || desc.includes('bag');
+                const isHandwoven = name.includes('woven') || name.includes('weave') || desc.includes('woven') || desc.includes('weave') || desc.includes('hand');
+
+                const categorySelected = filters.scarves || filters.bags || filters.handwoven;
+                const matchesCategory = !categorySelected || (
+                  (filters.scarves && isScarf) ||
+                  (filters.bags && isBag) ||
+                  (filters.handwoven && isHandwoven)
+                );
+
+                return matchesQuery && matchesCategory;
+              })
               .map((p) => (
                 <ProductCard key={p.id} product={p} onAdd={() => addItem(p, 1)} />
               ))

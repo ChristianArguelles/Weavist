@@ -14,10 +14,15 @@ export default function Cart(){
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
-            {items.map(it => (
+            {items.map(it => {
+              const API_URL = 'http://127.0.0.1:8000';
+              const imageUrl = it.product.image_url || (it.product.image
+                ? (String(it.product.image).startsWith('http') ? it.product.image : `${API_URL}${it.product.image}`)
+                : null);
+              return (
               <div key={it.product.id} className="flex items-center gap-6 border-b pb-6">
                 <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden">
-                  {it.product.image && <img src={it.product.image} alt={it.product.productName} className="w-full h-full object-cover" />}
+                  {imageUrl && <img src={imageUrl} alt={it.product.productName} className="w-full h-full object-cover" />}
                 </div>
                 <div className="flex-1">
                   <div className="font-semibold text-lg">{it.product.productName}</div>
@@ -79,7 +84,8 @@ export default function Cart(){
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <aside className="card p-6">

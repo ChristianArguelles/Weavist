@@ -63,5 +63,103 @@ class ProductSeeder extends Seeder
             'stock'             => 20,
             'image'             => $images[4],
         ]);
+
+        $additionalProducts = [
+            [
+                'name' => 'Loom Wall Hanging',
+                'short' => 'Decorative handwoven wall art.',
+                'full' => 'A statement piece for your home, intricately woven with natural fibers and traditional patterns.',
+                'desc' => 'Decorative wall art',
+                'price' => 85.00,
+                'stock' => 6,
+            ],
+            [
+                'name' => 'Handwoven Table Runner',
+                'short' => 'Elegant runner for dining tables.',
+                'full' => 'Adds texture and authenticity to your dining setup; crafted by skilled artisans.',
+                'desc' => 'Elegant table runner',
+                'price' => 35.00,
+                'stock' => 12,
+            ],
+            [
+                'name' => 'Patterned Pillow Cover',
+                'short' => 'Colorful cover for throw pillows.',
+                'full' => 'Made with durable fabric and vibrant patterns to brighten any space.',
+                'desc' => 'Colorful pillow cover',
+                'price' => 18.00,
+                'stock' => 25,
+            ],
+            [
+                'name' => 'Woven Coasters Set',
+                'short' => 'Set of 4 eco-friendly coasters.',
+                'full' => 'Protects surfaces while showcasing traditional weaving techniques.',
+                'desc' => 'Eco-friendly coasters',
+                'price' => 12.00,
+                'stock' => 40,
+            ],
+            [
+                'name' => 'Artisan Tote',
+                'short' => 'Spacious tote with woven accents.',
+                'full' => 'Perfect for daily use; combines function with heritage design elements.',
+                'desc' => 'Spacious woven tote',
+                'price' => 55.00,
+                'stock' => 10,
+            ],
+            [
+                'name' => 'Handloom Shawl',
+                'short' => 'Warm, soft handloom shawl.',
+                'full' => 'Comfortable and stylish, ideal for cool evenings; supports local weavers.',
+                'desc' => 'Warm handloom shawl',
+                'price' => 48.00,
+                'stock' => 9,
+            ],
+            [
+                'name' => 'Woven Keychain',
+                'short' => 'Compact, colorful keychain.',
+                'full' => 'A small accessory with a big story; each one is unique.',
+                'desc' => 'Colorful woven keychain',
+                'price' => 6.00,
+                'stock' => 100,
+            ],
+            [
+                'name' => 'Traditional Placemat',
+                'short' => 'Handwoven placemat for dining.',
+                'full' => 'Adds a rustic touch to your table while being easy to clean.',
+                'desc' => 'Handwoven placemat',
+                'price' => 9.00,
+                'stock' => 30,
+            ],
+            [
+                'name' => 'Fabric Basket',
+                'short' => 'Sturdy woven storage basket.',
+                'full' => 'Ideal for organizing, made from durable natural fibers.',
+                'desc' => 'Woven storage basket',
+                'price' => 22.00,
+                'stock' => 14,
+            ],
+            [
+                'name' => 'Embroidered Pouch',
+                'short' => 'Hand-embroidered zipper pouch.',
+                'full' => 'Perfect for small items; a blend of weaving and embroidery.',
+                'desc' => 'Hand-embroidered pouch',
+                'price' => 14.00,
+                'stock' => 50,
+            ],
+        ];
+
+        $index = 1;
+        foreach ($additionalProducts as $p) {
+            $imageIndex = (($index - 1) % 4) + 1; // cycle 1..4
+            Product::create([
+                'productName'       => $p['name'],
+                'shortDescription'  => $p['short'],
+                'fullDescription'   => $p['full'],
+                'description'       => $p['desc'],
+                'productPrice'      => $p['price'],
+                'stock'             => $p['stock'],
+                'image'             => $images[$imageIndex],
+            ]);
+            $index++;
+        }
     }
 }

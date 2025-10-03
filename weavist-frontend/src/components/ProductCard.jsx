@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const API_URL = "http://127.0.0.1:8000"; // adjust if your Laravel runs on a different host/port
 
 export default function ProductCard({ product, onAdd }) {
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
   // Ensure full image URL
   const imageUrl = product.image
     ? product.image.startsWith("http")
@@ -59,7 +61,17 @@ export default function ProductCard({ product, onAdd }) {
 
           <div className="mt-3 flex items-center gap-2 w-full">
             <button
-              onClick={() => onAdd(product)}
+              onClick={async () => {
+                if (product.stock <= 0 || adding) return;
+                setAdding(true);
+                try {
+                  await Promise.resolve(onAdd(product));
+                  setAdded(true);
+                  setTimeout(() => setAdded(false), 1200);
+                } finally {
+                  setAdding(false);
+                }
+              }}
               disabled={product.stock <= 0}
               className={
                 "btn-primary btn-icon btn-sm flex-1 justify-center " +
@@ -67,21 +79,29 @@ export default function ProductCard({ product, onAdd }) {
               }
               title="Add to cart"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6.2A1 1 0 007.8 21h8.4a1 1 0 001-.8L18 13"
-                />
-              </svg>
-              <span>Add</span>
+              {adding ? (
+                <span>Adding…</span>
+              ) : added ? (
+                <span>Added ✓</span>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6.2A1 1 0 007.8 21h8.4a1 1 0 001-.8L18 13"
+                    />
+                  </svg>
+                  <span>Add</span>
+                </>
+              )}
             </button>
 
             <Link

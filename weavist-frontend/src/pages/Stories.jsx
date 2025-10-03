@@ -2,35 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 
-function VideoEmbed({ url, title }) {
-  if (!url) return null;
-  if (url.includes("youtube.com") || url.includes("youtu.be")) {
-    const embed = url.includes("watch?v=")
-      ? url.replace("watch?v=", "embed/")
-      : url;
-    return (
-      <div className="mt-3">
-        <iframe
-          className="w-full h-64 rounded"
-          src={embed}
-          title={title}
-          frameBorder="0"
-          allowFullScreen
-        ></iframe>
-      </div>
-    );
-  }
-  if (url.endsWith(".mp4")) {
-    return (
-      <video controls className="w-full mt-3 rounded">
-        <source src={url} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    );
-  }
-  return null;
-}
-
 export default function Stories() {
   const navigate = useNavigate();
   const [stories, setStories] = useState([]);
@@ -123,47 +94,7 @@ export default function Stories() {
         )}
       </section>
 
-      {/* Watch Section */}
-      <section className="py-12 border-t">
-        <h2 className="text-2xl font-bold text-primary text-center mb-6">
-          Watch the Beauty of Weaving
-        </h2>
-        {stories.filter((s) => s.video).length === 0 ? (
-          <div className="text-gray-600 text-center mb-6">
-            No videos available at the moment.
-          </div>
-        ) : (
-          <div className="max-w-5xl mx-auto space-y-8 px-4">
-            {stories
-              .filter((s) => s.video)
-              .map((s) => (
-                <div
-                  key={s.id}
-                  className="bg-white rounded-lg shadow p-6 flex items-start gap-6"
-                >
-                  {/* Video (fixed size on left) */}
-                  <div className="w-1/3 min-w-[250px] rounded-lg overflow-hidden">
-                    <VideoEmbed url={s.video} title={s.storyTitle} />
-                  </div>
 
-                  {/* Text on right */}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2 break-words">
-                      {s.storyTitle}
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {s.content
-                        ? s.content.length > 250
-                          ? s.content.slice(0, 247) + "…"
-                          : s.content
-                        : ""}
-                    </p>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }
