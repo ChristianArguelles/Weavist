@@ -78,8 +78,8 @@ export default function Stories() {
                   <p className="text-sm text-gray-600 text-left one-line">
                     {s.content ? s.content : ""}
                   </p>
-                  {/* Button pinned bottom-right */}
-                  <div className="mt-auto self-end">
+                  {/* Button pinned bottom-right with a bit more space above */}
+                  <div className="mt-auto pt-3 self-end">
                     <button
                       onClick={() => navigate(`/stories/${s.id}`)}
                       className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition"

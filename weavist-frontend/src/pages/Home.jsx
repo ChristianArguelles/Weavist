@@ -129,15 +129,30 @@ export default function Home() {
           <div className="text-gray-600 mb-6">No stories available at the moment.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-6">
-            {stories.map(s => (
-              <div key={s.id} className="bg-white rounded-lg p-6 text-left shadow">
-                <h3 className="font-semibold mb-2 break-words whitespace-normal max-w-full">{s.storyTitle}</h3>
-                <p className="text-sm text-gray-600 one-line">{s.content ? s.content : ''}</p>
-                <div className="mt-4">
-                  <button onClick={()=>navigate('/stories')} className="text-sm text-accent hover:underline">View more</button>
+            {stories.map(s => {
+              const mediaUrl = s.media
+                ? (s.media.startsWith('http') ? s.media : `${API_URL}${s.media}`)
+                : null;
+
+              return (
+                <div key={s.id} className="bg-white rounded-lg p-6 text-left shadow">
+                  {mediaUrl && (
+                    <div className="h-40 bg-gray-100 rounded overflow-hidden mb-4">
+                      <img
+                        src={mediaUrl}
+                        alt={s.storyTitle}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <h3 className="font-semibold mb-2 break-words whitespace-normal max-w-full">{s.storyTitle}</h3>
+                  <p className="text-sm text-gray-600 one-line">{s.content ? s.content : ''}</p>
+                  <div className="mt-4">
+                    <button onClick={()=>navigate('/stories')} className="text-sm text-accent hover:underline">View more</button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         <div className="mt-6">

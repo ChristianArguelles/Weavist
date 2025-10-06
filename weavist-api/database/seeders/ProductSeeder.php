@@ -22,6 +22,10 @@ class ProductSeeder extends Seeder
             2 => Storage::url('products/product2.jpg'),
             3 => Storage::url('products/product3.jpg'),
             4 => Storage::url('products/product4.jpg'),
+            5 => Storage::url('products/product5.jpg'),
+            6 => Storage::url('products/product6.jpg'),
+            7 => Storage::url('products/product7.jpg'),
+            8 => Storage::url('products/product8.jpg'),
         ];
 
         Product::create([
@@ -64,102 +68,44 @@ class ProductSeeder extends Seeder
             'image'             => $images[4],
         ]);
 
-        $additionalProducts = [
-            [
-                'name' => 'Loom Wall Hanging',
-                'short' => 'Decorative handwoven wall art.',
-                'full' => 'A statement piece for your home, intricately woven with natural fibers and traditional patterns.',
-                'desc' => 'Decorative wall art',
-                'price' => 85.00,
-                'stock' => 6,
-            ],
-            [
-                'name' => 'Handwoven Table Runner',
-                'short' => 'Elegant runner for dining tables.',
-                'full' => 'Adds texture and authenticity to your dining setup; crafted by skilled artisans.',
-                'desc' => 'Elegant table runner',
-                'price' => 35.00,
-                'stock' => 12,
-            ],
-            [
-                'name' => 'Patterned Pillow Cover',
-                'short' => 'Colorful cover for throw pillows.',
-                'full' => 'Made with durable fabric and vibrant patterns to brighten any space.',
-                'desc' => 'Colorful pillow cover',
-                'price' => 18.00,
-                'stock' => 25,
-            ],
-            [
-                'name' => 'Woven Coasters Set',
-                'short' => 'Set of 4 eco-friendly coasters.',
-                'full' => 'Protects surfaces while showcasing traditional weaving techniques.',
-                'desc' => 'Eco-friendly coasters',
-                'price' => 12.00,
-                'stock' => 40,
-            ],
-            [
-                'name' => 'Artisan Tote',
-                'short' => 'Spacious tote with woven accents.',
-                'full' => 'Perfect for daily use; combines function with heritage design elements.',
-                'desc' => 'Spacious woven tote',
-                'price' => 55.00,
-                'stock' => 10,
-            ],
-            [
-                'name' => 'Handloom Shawl',
-                'short' => 'Warm, soft handloom shawl.',
-                'full' => 'Comfortable and stylish, ideal for cool evenings; supports local weavers.',
-                'desc' => 'Warm handloom shawl',
-                'price' => 48.00,
-                'stock' => 9,
-            ],
-            [
-                'name' => 'Woven Keychain',
-                'short' => 'Compact, colorful keychain.',
-                'full' => 'A small accessory with a big story; each one is unique.',
-                'desc' => 'Colorful woven keychain',
-                'price' => 6.00,
-                'stock' => 100,
-            ],
-            [
-                'name' => 'Traditional Placemat',
-                'short' => 'Handwoven placemat for dining.',
-                'full' => 'Adds a rustic touch to your table while being easy to clean.',
-                'desc' => 'Handwoven placemat',
-                'price' => 9.00,
-                'stock' => 30,
-            ],
-            [
-                'name' => 'Fabric Basket',
-                'short' => 'Sturdy woven storage basket.',
-                'full' => 'Ideal for organizing, made from durable natural fibers.',
-                'desc' => 'Woven storage basket',
-                'price' => 22.00,
-                'stock' => 14,
-            ],
-            [
-                'name' => 'Embroidered Pouch',
-                'short' => 'Hand-embroidered zipper pouch.',
-                'full' => 'Perfect for small items; a blend of weaving and embroidery.',
-                'desc' => 'Hand-embroidered pouch',
-                'price' => 14.00,
-                'stock' => 50,
-            ],
-        ];
+        Product::create([
+            'productName'       => 'Loom Wall Hanging',
+            'shortDescription'  => 'Decorative handwoven wall art.',
+            'fullDescription'   => 'A statement piece for your home, intricately woven with natural fibers and traditional patterns.',
+            'description'       => 'Decorative wall art',
+            'productPrice'      => 85.00,
+            'stock'             => 6,
+            'image'             => $images[5],
+        ]);
 
-        $index = 1;
-        foreach ($additionalProducts as $p) {
-            $imageIndex = (($index - 1) % 4) + 1; // cycle 1..4
-            Product::create([
-                'productName'       => $p['name'],
-                'shortDescription'  => $p['short'],
-                'fullDescription'   => $p['full'],
-                'description'       => $p['desc'],
-                'productPrice'      => $p['price'],
-                'stock'             => $p['stock'],
-                'image'             => $images[$imageIndex],
-            ]);
-            $index++;
-        }
+        Product::create([
+            'productName'       => 'Handwoven Table Runner',
+            'shortDescription'  => 'Elegant runner for dining tables.',
+            'fullDescription'   => 'Adds texture and authenticity to your dining setup; crafted by skilled artisans.',
+            'description'       => 'Elegant table runner',
+            'productPrice'      => 35.00,
+            'stock'             => 12,
+            'image'             => $images[6],
+        ]);
+
+        Product::create([
+            'productName'       => 'Patterned Pillow Cover',
+            'shortDescription'  => 'Colorful cover for throw pillows.',
+            'fullDescription'   => 'Made with durable fabric and vibrant patterns to brighten any space.',
+            'description'       => 'Colorful pillow cover',
+            'productPrice'      => 18.00,
+            'stock'             => 25,
+            'image'             => $images[7],
+        ]);
+
+        Product::create([
+            'productName'       => 'Woven Coasters Set',
+            'shortDescription'  => 'Set of 4 eco-friendly coasters.',
+            'fullDescription'   => 'Protects surfaces while showcasing traditional weaving techniques.',
+            'description'       => 'Eco-friendly coasters',
+            'productPrice'      => 12.00,
+            'stock'             => 40,
+            'image'             => $images[8],
+        ]);
     }
 }
