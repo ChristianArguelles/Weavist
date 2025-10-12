@@ -4,6 +4,9 @@ import { api } from '../api/client';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Backend base URL
+const API_URL = "http://127.0.0.1:8000";
+
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,14 @@ export default function Checkout() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [editable, setEditable] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [paymentMethod, setPaymentMethod] = useState('');
+
+  // Payment fields (from SupportWeavers)
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCVV, setCardCVV] = useState('');
+  const [paypalEmail, setPaypalEmail] = useState('');
+  const [gcashNumber, setGcashNumber] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -31,6 +41,33 @@ export default function Checkout() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Validate payment method
+    if (!paymentMethod) {
+      setError('Please select a payment method');
+      setLoading(false);
+      return;
+    }
+
+    // Validate payment fields
+    if (paymentMethod === "card") {
+      if (!cardNumber || !cardExpiry || !cardCVV) {
+        setError('Please fill in all card details');
+        setLoading(false);
+        return;
+      }
+    }
+    if (paymentMethod === "paypal" && !paypalEmail) {
+      setError('Please enter your PayPal email');
+      setLoading(false);
+      return;
+    }
+    if (paymentMethod === "gcash" && !gcashNumber) {
+      setError('Please enter your GCash number');
+      setLoading(false);
+      return;
+    }
+
     let resp;
     const payload = {
       items: items.map(i => ({ product: { id: i.product.id }, quantity: i.quantity })),
@@ -38,6 +75,15 @@ export default function Checkout() {
       address,
       phone,
       email,
+      paymentMethod,
+      // Include payment details based on method
+      ...(paymentMethod === "card" && {
+        cardNumber,
+        cardExpiry,
+        cardCVV
+      }),
+      ...(paymentMethod === "paypal" && { paypalEmail }),
+      ...(paymentMethod === "gcash" && { gcashNumber })
     };
 
     try {
@@ -107,11 +153,79 @@ export default function Checkout() {
 
           {/* Payment method */}
           <div className="mt-6 card p-6">
-            <h3 className="font-semibold mb-3">Choose Payment Method</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button type="button" onClick={()=>setPaymentMethod('cod')} className={`p-6 border rounded shadow-sm text-center ${paymentMethod==='cod' ? 'border-accent ring-accent' : ''}`}>Cash on Delivery</button>
-              <button type="button" onClick={()=>setPaymentMethod('card')} className={`p-6 border rounded shadow-sm text-center ${paymentMethod==='card' ? 'border-accent ring-accent' : ''}`}>Credit Card</button>
+            <h3 className="text-xl font-semibold mb-4 text-accent">
+              Payment Method
+            </h3>
+            <div className="flex gap-4 mb-6">
+              {["card", "paypal", "gcash", "cod"].map((method) => (
+                <button
+                  key={method}
+                  type="button"
+                  onClick={() => setPaymentMethod(method)}
+                  className={`px-6 py-3 border rounded-lg capitalize ${
+                    paymentMethod === method
+                      ? "bg-accent text-white"
+                      : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  {method === "cod" ? "Cash on Delivery" : method}
+                </button>
+              ))}
             </div>
+
+            {/* Conditional payment fields */}
+            {paymentMethod === "card" && (
+              <div className="mb-6 space-y-3">
+                <input
+                  type="text"
+                  placeholder="Card Number"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  className="w-full border rounded-lg px-4 py-3"
+                />
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(e.target.value)}
+                    className="w-1/2 border rounded-lg px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    placeholder="CVV"
+                    value={cardCVV}
+                    onChange={(e) => setCardCVV(e.target.value)}
+                    className="w-1/2 border rounded-lg px-4 py-3"
+                  />
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === "paypal" && (
+              <div className="mb-6">
+                <input
+                  type="email"
+                  placeholder="PayPal Email"
+                  value={paypalEmail}
+                  onChange={(e) => setPaypalEmail(e.target.value)}
+                  className="w-full border rounded-lg px-4 py-3"
+                />
+              </div>
+            )}
+
+            {paymentMethod === "gcash" && (
+              <div className="mb-6">
+                <input
+                  type="text"
+                  placeholder="GCash Number"
+                  value={gcashNumber}
+                  onChange={(e) => setGcashNumber(e.target.value)}
+                  className="w-full border rounded-lg px-4 py-3"
+                />
+              </div>
+            )}
+
             <div className="mt-4 flex gap-4">
               <button onClick={()=>nav('/cart')} className="btn-muted flex-1">Back to Cart</button>
               <button onClick={submitOrder} disabled={loading} className="btn-primary flex-1">{loading ? 'Placing...' : 'Place Order'}</button>
@@ -124,18 +238,37 @@ export default function Checkout() {
           <div className="card p-6">
             <h3 className="font-semibold mb-4">Order Summary</h3>
             <div className="space-y-3">
-              {items.map(it => (
-                <div key={it.product.id} className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden">
-                    {it.product.image && <img src={it.product.image} className="w-full h-full object-cover" />}
+              {items.map(it => {
+                // Ensure full image URL
+                const imageUrl = it.product.image
+                  ? it.product.image.startsWith("http")
+                    ? it.product.image
+                    : `${API_URL}${it.product.image}`
+                  : null;
+
+                return (
+                  <div key={it.product.id} className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={it.product.productName || it.product.name}
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-400">
+                          No img
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">{it.product.productName || it.product.name}</div>
+                      <div className="text-sm text-gray-500">Qty: {it.quantity}</div>
+                    </div>
+                    <div>₱{Number(it.product.productPrice * it.quantity).toFixed(2)}</div>
                   </div>
-                  <div className="flex-1">
-                    <div className="font-medium">{it.product.productName || it.product.name}</div>
-                    <div className="text-sm text-gray-500">Qty: {it.quantity}</div>
-                  </div>
-                  <div>₱{Number(it.product.productPrice * it.quantity).toFixed(2)}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <hr className="my-4" />
             <div className="flex justify-between font-semibold">

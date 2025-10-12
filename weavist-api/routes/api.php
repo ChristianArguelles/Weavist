@@ -21,6 +21,20 @@ Route::get('/campaigns/{campaign}', [CampaignController::class,'show']);
 Route::post('/auth/register', [AuthController::class,'register']);
 Route::post('/auth/login', [AuthController::class,'login']);
 
+// Email verification
+Route::get('/email/verify/{id}/{hash}', [AuthController::class,'verify'])->name('verification.verify');
+Route::post('/email/resend', [AuthController::class,'resendVerification']);
+
+// Test email (for local development)
+Route::get('/test-email', function() {
+    $user = \App\Models\User::first();
+    if ($user) {
+        $user->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Test email sent to ' . $user->email . '. Check storage/logs/laravel.log']);
+    }
+    return response()->json(['message' => 'No users found. Please register first.']);
+});
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/auth/logout',[AuthController::class,'logout']);

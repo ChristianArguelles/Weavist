@@ -23,9 +23,14 @@ class AuthController extends Controller
         $data['role'] = $r->input('role', 'user');
 
         $user = User::create($data);
-        $token = $user->createToken('api-token')->plainTextToken;
+        
+        // Send email verification notification
+        $user->sendEmailVerificationNotification();
 
-        return response()->json(['user' => $user, 'token' => $token], 201);
+        return response()->json([
+            'message' => 'Registration successful! Please check your email to verify your account.',
+            'user' => $user
+        ], 201);
     }
 
     public function login(Request $r) {
@@ -34,6 +39,15 @@ class AuthController extends Controller
         if (!$user || !Hash::check($r->password, $user->password)) {
             return response()->json(['message'=>'Invalid credentials'], 401);
         }
+        
+        // Check if email is verified
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Please verify your email before logging in.',
+                'email_verified' => false
+            ], 403);
+        }
+        
         $token = $user->createToken('api-token')->plainTextToken;
         return response()->json(['user' => $user, 'token' => $token]);
     }
@@ -66,5 +80,38 @@ class AuthController extends Controller
         $u->save();
 
         return response()->json($u);
+    }
+
+    public function verify(Request $r, $id, $hash) {
+        $user = User::findOrFail($id);
+        
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Invalid verification link'], 400);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        $user->markEmailAsVerified();
+
+        return response()->json(['message' => 'Email verified successfully']);
+    }
+
+    public function resendVerification(Request $r) {
+        $r->validate(['email' => 'required|email']);
+        
+        $user = User::where('email', $r->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification email sent']);
     }
 }

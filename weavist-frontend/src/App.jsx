@@ -11,6 +11,7 @@ import SupportWeavers from './pages/SupportWeavers';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import EmailVerification from './pages/EmailVerification';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminStories from './pages/admin/Stories';
@@ -46,6 +47,7 @@ export default function App(){
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/email/verify/:id/:hash" element={<EmailVerification />} />
         
         // For admin
         <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

@@ -91,8 +91,21 @@ export default function StoryDetails() {
               allowFullScreen
             ></iframe>
           </div>
-          <div className="mt-3 text-sm">
-            <a href={story.video} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">Open on YouTube</a>
+          
+          {/* Citation */}
+          <div className="mt-4 flex justify-between items-center text-sm">
+            <div>
+              <div className="text-gray-800 font-medium">Video Source</div>
+              <div className="text-gray-600">YouTube</div>
+            </div>
+            <a 
+              href={story.video} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-accent hover:underline font-medium"
+            >
+              View on YouTube →
+            </a>
           </div>
         </div>
       ) : null}

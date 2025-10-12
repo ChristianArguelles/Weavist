@@ -8,6 +8,7 @@ export default function Login(){
   const nav = useNavigate();
   const [email,setEmail]=useState(''); const [password,setPassword]=useState('');
   const [loading,setLoading]=useState(false); const [error,setError]=useState('');
+  const [resending,setResending]=useState(false);
 
   const submit = async e => {
     e.preventDefault();
@@ -21,9 +22,30 @@ export default function Login(){
         setError('Login failed: no token returned');
       }
     } catch(err) {
-      setError(err.response?.data?.message || err.message);
+      if (err.response?.status === 403 && err.response?.data?.email_verified === false) {
+        setError('Please verify your email before logging in.');
+      } else {
+        setError(err.response?.data?.message || err.message);
+      }
     }
     setLoading(false);
+  };
+
+  const resendVerification = async () => {
+    if (!email) {
+      setError('Please enter your email address first.');
+      return;
+    }
+    
+    setResending(true);
+    setError('');
+    try {
+      await api.post('/email/resend', { email });
+      setError('Verification email sent! Please check your inbox.');
+    } catch(err) {
+      setError(err.response?.data?.message || 'Failed to send verification email.');
+    }
+    setResending(false);
   };
 
   return (
@@ -40,7 +62,23 @@ export default function Login(){
           <label className="text-sm text-gray-700">Password</label>
           <input type="password" className="w-full border rounded-md px-3 py-2 focus:ring-2 ring-accent" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} />
 
-          {error && <div className="text-primary">{error}</div>}
+          {error && (
+            <div className="text-primary">
+              {error}
+              {error.includes('verify your email') && (
+                <div className="mt-2">
+                  <button 
+                    type="button"
+                    onClick={resendVerification}
+                    disabled={resending}
+                    className="text-sm text-indigo-600 hover:text-indigo-800 underline"
+                  >
+                    {resending ? 'Sending...' : 'Resend verification email'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <button className="btn-primary w-full" disabled={loading}>{loading ? 'Logging in...' : 'Sign in'}</button>
         </form>
