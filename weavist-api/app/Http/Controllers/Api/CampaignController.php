@@ -8,8 +8,16 @@ use App\Models\Campaign;
 
 class CampaignController extends Controller
 {
-    public function index() {
-        return Campaign::orderBy('id','desc')->get();
+    public function index(Request $r) {
+        // For public view, hide archived campaigns unless explicitly requested
+        $query = Campaign::orderBy('id','desc');
+        
+        // If not authenticated or not admin, hide archived campaigns
+        if (!$r->user() || $r->user()->role !== 'admin') {
+            $query->where('archived', false);
+        }
+        
+        return $query->get();
     }
 
     public function store(Request $r) {
@@ -38,5 +46,10 @@ class CampaignController extends Controller
     public function destroy(Campaign $campaign) {
         $campaign->delete();
         return response()->noContent();
+    }
+    
+    public function archive(Campaign $campaign) {
+        $campaign->update(['archived' => !$campaign->archived]);
+        return $campaign;
     }
 }

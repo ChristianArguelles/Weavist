@@ -45,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('products', ProductController::class)->except(['index','show']);
     Route::apiResource('stories', StoryController::class)->except(['index','show']);
     Route::apiResource('campaigns', CampaignController::class)->except(['index','show']);
+    
+    // Campaign archive toggle
+    Route::patch('/campaigns/{campaign}/archive', [CampaignController::class,'archive']);
 
     // Orders & Donations
     Route::post('/orders', [OrderController::class,'store']);

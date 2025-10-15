@@ -9,5 +9,9 @@ class Campaign extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title','description','donationTarget','raisedAmount','image'];
+    protected $fillable = ['title','description','donationTarget','raisedAmount','image','archived'];
+    
+    protected $casts = [
+        'archived' => 'boolean',
+    ];
 }

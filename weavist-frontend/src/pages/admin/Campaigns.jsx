@@ -16,7 +16,16 @@ export default function AdminCampaigns(){
 
   async function submitForm(e){ e.preventDefault(); try { if(editingId){ await api.put(`/campaigns/${editingId}`, form); } else { await api.post('/campaigns', form); } setModalOpen(false); fetchList(); } catch(e){ alert(e.response?.data?.message || e.message); } }
 
-  async function deleteCampaign(id){ if(!confirm('Delete campaign?')) return; try { await api.delete(`/campaigns/${id}`); fetchList(); } catch(e){ alert(e.response?.data?.message || e.message); } }
+  async function toggleArchive(campaign){ 
+    const action = campaign.archived ? 'unarchive' : 'archive';
+    if(!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} this campaign?`)) return; 
+    try { 
+      await api.patch(`/campaigns/${campaign.id}/archive`); 
+      fetchList(); 
+    } catch(e){ 
+      alert(e.response?.data?.message || e.message); 
+    } 
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -34,6 +43,7 @@ export default function AdminCampaigns(){
                 <th className="px-3 py-2 text-left">Description</th>
                 <th className="px-3 py-2 text-center">Target</th>
                 <th className="px-3 py-2 text-center">Raised</th>
+                <th className="px-3 py-2 text-center">Status</th>
                 <th className="px-3 py-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -41,7 +51,7 @@ export default function AdminCampaigns(){
               {campaigns.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="7"
                     className="px-3 py-6 text-center text-gray-500"
                   >
                     No campaigns found.
@@ -49,12 +59,17 @@ export default function AdminCampaigns(){
                 </tr>
               ) : (
                 campaigns.map((c) => (
-                  <tr key={c.id} className="border-t hover:bg-gray-50">
+                  <tr key={c.id} className={`border-t hover:bg-gray-50 ${c.archived ? 'bg-gray-100 opacity-60' : ''}`}>
                     <td className="px-3 py-2 text-center">{c.id}</td>
                     <td className="px-3 py-2 max-w-[250px] whitespace-normal break-words">{c.title}</td>
                     <td className="px-3 py-2 max-w-[350px] whitespace-normal break-words text-sm text-gray-600">{c.description ? (c.description.length > 120 ? c.description.slice(0,120) + '…' : c.description) : '-'}</td>
                     <td className="px-3 py-2 text-center">₱{c.donationTarget}</td>
                     <td className="px-3 py-2 text-center">₱{c.raisedAmount}</td>
+                    <td className="px-3 py-2 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${c.archived ? 'bg-gray-300 text-gray-700' : 'bg-green-100 text-green-700'}`}>
+                        {c.archived ? 'Archived' : 'Active'}
+                      </span>
+                    </td>
                     <td className="px-3 py-2">
                       <div className="flex justify-center gap-2">
                         <button
@@ -64,10 +79,10 @@ export default function AdminCampaigns(){
                           Edit
                         </button>
                         <button
-                          onClick={() => deleteCampaign(c.id)}
-                          className="bg-primary text-white px-2 py-1 rounded hover:bg-primary-hover transition"
+                          onClick={() => toggleArchive(c)}
+                          className={`${c.archived ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'} text-white px-2 py-1 rounded transition`}
                         >
-                          Delete
+                          {c.archived ? 'Unarchive' : 'Archive'}
                         </button>
                       </div>
                     </td>
