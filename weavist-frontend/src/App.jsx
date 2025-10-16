@@ -21,6 +21,7 @@ import AdminDonations from './pages/admin/Donations';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import StoryDetails from "./pages/StoryDetails";
+import ProductHistory from "./pages/ProductHistory";
 
 function AdminRoute({ children }) {
   const raw = localStorage.getItem('weavist_auth');
@@ -47,6 +48,7 @@ export default function App(){
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/history" element={<ProductHistory />} />
         <Route path="/email/verify/:id/:hash" element={<EmailVerification />} />
         
         // For admin

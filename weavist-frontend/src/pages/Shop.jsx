@@ -9,8 +9,13 @@ export default function Shop() {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({ handwoven: false, scarves: false, bags: false });
-  const { getAvailableStock } = useCart(); // keep stock-aware function
+  const [filters, setFilters] = useState({
+    handwoven: false,
+    scarves: false,
+    bags: false,
+  });
+
+  const { getAvailableStock } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,22 +36,27 @@ export default function Shop() {
     setLoading(false);
   }
 
-  const filteredProducts = products.filter(p => {
-    const q = (query || '').toLowerCase();
-    const name = (p.productName || '').toLowerCase();
-    const desc = (p.description || '').toLowerCase();
-    const matchesQuery = q === '' || name.includes(q) || desc.includes(q);
+  const filteredProducts = products.filter((p) => {
+    const q = (query || "").toLowerCase();
+    const name = (p.productName || "").toLowerCase();
+    const desc = (p.description || "").toLowerCase();
+    const matchesQuery = q === "" || name.includes(q) || desc.includes(q);
 
-    const isScarf = name.includes('scarf') || desc.includes('scarf');
-    const isBag = name.includes('bag') || desc.includes('bag');
-    const isHandwoven = name.includes('woven') || name.includes('weave') || desc.includes('woven') || desc.includes('weave') || desc.includes('hand');
+    const isScarf = name.includes("scarf") || desc.includes("scarf");
+    const isBag = name.includes("bag") || desc.includes("bag");
+    const isHandwoven =
+      name.includes("woven") ||
+      name.includes("weave") ||
+      desc.includes("woven") ||
+      desc.includes("weave") ||
+      desc.includes("hand");
 
     const categorySelected = filters.scarves || filters.bags || filters.handwoven;
-    const matchesCategory = !categorySelected || (
+    const matchesCategory =
+      !categorySelected ||
       (filters.scarves && isScarf) ||
       (filters.bags && isBag) ||
-      (filters.handwoven && isHandwoven)
-    );
+      (filters.handwoven && isHandwoven);
 
     return matchesQuery && matchesCategory;
   });
@@ -63,46 +73,77 @@ export default function Shop() {
             className="border rounded-full px-4 py-2 w-64"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') setQuery(e.target.value); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setQuery(e.target.value);
+            }}
             aria-label="Search products"
           />
 
           {/* Search button */}
           <button
-            onClick={() => document.querySelector('input[aria-label="Search products"]').focus()}
+            onClick={() =>
+              document.querySelector('input[aria-label="Search products"]').focus()
+            }
             className="p-2 weave-icon rounded hover:bg-gray-100"
             aria-label="Focus search"
             title="Focus search"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-gray-700"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
+              />
             </svg>
           </button>
 
           {/* Filters toggle */}
           <div className="relative">
             <button
-              onClick={() => setShowFilters(v => !v)}
+              onClick={() => setShowFilters((v) => !v)}
               className="p-2 weave-icon rounded hover:bg-gray-100"
               aria-expanded={showFilters}
               aria-controls="shop-filters"
               aria-label="Toggle filters"
               title="Filters"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h18M6 12h12M10 19h4" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-gray-700"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 5h18M6 12h12M10 19h4"
+                />
               </svg>
             </button>
 
             {showFilters && (
-              <div id="shop-filters" className="absolute right-0 mt-2 w-64 bg-white border rounded shadow-md p-3 z-40">
+              <div
+                id="shop-filters"
+                className="absolute right-0 mt-2 w-64 bg-white border rounded shadow-md p-3 z-40"
+              >
                 <div className="text-sm font-semibold mb-2">Filters</div>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={filters.handwoven}
-                      onChange={(e) => setFilters(f => ({ ...f, handwoven: e.target.checked }))}
+                      onChange={(e) =>
+                        setFilters((f) => ({ ...f, handwoven: e.target.checked }))
+                      }
                     />
                     Handwoven
                   </label>
@@ -110,7 +151,9 @@ export default function Shop() {
                     <input
                       type="checkbox"
                       checked={filters.scarves}
-                      onChange={(e) => setFilters(f => ({ ...f, scarves: e.target.checked }))}
+                      onChange={(e) =>
+                        setFilters((f) => ({ ...f, scarves: e.target.checked }))
+                      }
                     />
                     Scarves
                   </label>
@@ -118,7 +161,9 @@ export default function Shop() {
                     <input
                       type="checkbox"
                       checked={filters.bags}
-                      onChange={(e) => setFilters(f => ({ ...f, bags: e.target.checked }))}
+                      onChange={(e) =>
+                        setFilters((f) => ({ ...f, bags: e.target.checked }))
+                      }
                     />
                     Bags
                   </label>
@@ -126,7 +171,9 @@ export default function Shop() {
                 <div className="mt-3 flex justify-between">
                   <button
                     className="text-sm text-gray-600 hover:underline"
-                    onClick={() => setFilters({ handwoven: false, scarves: false, bags: false })}
+                    onClick={() =>
+                      setFilters({ handwoven: false, scarves: false, bags: false })
+                    }
                   >
                     Clear
                   </button>
@@ -142,9 +189,48 @@ export default function Shop() {
           </div>
 
           {/* Cart button */}
-          <button onClick={() => navigate("/cart")} className="p-2 weave-icon rounded hover:bg-gray-100" aria-label="View cart" title="Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6.2A1 1 0 007.8 21h8.4a1 1 0 001-.8L18 13" />
+          <button
+            onClick={() => navigate("/cart")}
+            className="p-2 weave-icon rounded hover:bg-gray-100"
+            aria-label="View cart"
+            title="Cart"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-gray-700"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6.2A1 1 0 007.8 21h8.4a1 1 0 001-.8L18 13"
+              />
+            </svg>
+          </button>
+
+          {/* 🕓 History button */}
+          <button
+            onClick={() => navigate("/history")}
+            className="p-2 weave-icon rounded hover:bg-gray-100"
+            aria-label="View order history"
+            title="Order History"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-gray-700"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </button>
         </div>
@@ -156,9 +242,7 @@ export default function Shop() {
       ) : (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))
+            filteredProducts.map((p) => <ProductCard key={p.id} product={p} />)
           ) : (
             <p>No products found.</p>
           )}
