@@ -80,7 +80,7 @@ export default function Profile(){
           </div>
 
           <div>
-            <div className="text-sm text-gray-500">Shipping address</div>
+            <div className="text-sm text-gray-500">Address</div>
             {!editing ? (
               <div className="mt-1 font-medium text-gray-900">{user.address || <span className="text-gray-400">Not set</span>}</div>
             ) : (
