@@ -70,7 +70,7 @@ export default function StoryDetails() {
       <hr className="border-gray-200 mb-8" />
 
       {story.media_url ? (
-        <div className="w-full h-72 mb-8 rounded overflow-hidden shadow">
+        <div className="w-full h-100 mb-8 rounded overflow-hidden shadow">
           <img src={story.media_url} alt={story.storyTitle} className="w-full h-full object-cover" />
         </div>
       ) : (
