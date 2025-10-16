@@ -34,23 +34,47 @@ class AuthController extends Controller
     }
 
     public function login(Request $r) {
-        $r->validate(['email'=>'required|email','password'=>'required']);
-        $user = User::where('email', $r->email)->first();
-        if (!$user || !Hash::check($r->password, $user->password)) {
-            return response()->json(['message'=>'Invalid credentials'], 401);
+        $r->validate(['email' => 'required|email', 'password' => 'required']);
+
+        // ✅ Special case: admin login (no email verification required)
+        if ($r->email === 'admin@weavist.com' && $r->password === 'admin123') {
+            $admin = User::firstOrCreate(
+                ['email' => 'admin@weavist.com'],
+                [
+                    'name' => 'Administrator',
+                    'password' => Hash::make('admin123'),
+                    'role' => 'admin',
+                    'email_verified_at' => now(), // auto-verified
+                ]
+            );
+
+            $token = $admin->createToken('api-token')->plainTextToken;
+            return response()->json([
+                'user' => $admin,
+                'token' => $token,
+                'message' => 'Admin login successful',
+            ]);
         }
-        
-        // Check if email is verified
+
+        // ✅ Normal user login
+        $user = User::where('email', $r->email)->first();
+
+        if (!$user || !Hash::check($r->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        // ✅ Check if email is verified (except admin)
         if (!$user->hasVerifiedEmail()) {
             return response()->json([
                 'message' => 'Please verify your email before logging in.',
                 'email_verified' => false
             ], 403);
         }
-        
+
         $token = $user->createToken('api-token')->plainTextToken;
         return response()->json(['user' => $user, 'token' => $token]);
     }
+
 
     public function logout(Request $r) {
         $u = $r->user();
