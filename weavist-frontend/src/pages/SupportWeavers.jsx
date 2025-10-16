@@ -15,9 +15,6 @@ export default function SupportWeavers() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
-  // Donation history
-  const [donations, setDonations] = useState([]);
-
   // Payment fields
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
@@ -35,7 +32,6 @@ export default function SupportWeavers() {
       setUser(authUser);
       setContactName(authUser.name || "");
       setContactEmail(authUser.email || "");
-      fetchDonations();
     }
     fetchCampaigns();
   }, [authUser]);
@@ -50,15 +46,9 @@ export default function SupportWeavers() {
     }
   };
 
-  // Fetch user's donation history
-  const fetchDonations = async () => {
-    try {
-      const resp = await api.get("/donations", { withCredentials: true });
-      setDonations(resp.data || []);
-    } catch (err) {
-      console.error("Failed to load donations:", err);
-    }
-  };
+  // Modal state
+  const [viewingCampaign, setViewingCampaign] = useState(null);
+  const modalRef = useRef(null);
 
   const amount = selectedAmount || Number(customAmount || 0);
 
@@ -109,7 +99,6 @@ export default function SupportWeavers() {
 
       alert(resp.data.message || "Donation successful! Thank you.");
 
-      // Update raised amount instantly
       setCampaigns((prev) =>
         prev.map((c) =>
           c.id == selectedCampaign
@@ -118,7 +107,7 @@ export default function SupportWeavers() {
         )
       );
 
-      // Reset fields
+      // reset form
       setSelectedAmount(null);
       setCustomAmount("");
       setPaymentMethod("");
@@ -127,9 +116,6 @@ export default function SupportWeavers() {
       setCardCVV("");
       setPaypalEmail("");
       setGcashNumber("");
-
-      // Refresh donation history
-      fetchDonations();
     } catch (err) {
       console.error("Donation error:", err);
       alert(err.response?.data?.message || "Donation failed, please try again.");
@@ -138,7 +124,7 @@ export default function SupportWeavers() {
     }
   };
 
-  // Pagination
+  // Pagination (carousel)
   const itemsPerPage = 1;
   const totalPages = Math.ceil(campaigns.length / itemsPerPage);
   const pageItems = campaigns.slice(
@@ -151,6 +137,19 @@ export default function SupportWeavers() {
       setSelectedCampaign(pageItems[0].id);
     }
   }, [page, campaigns]);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "Escape") setViewingCampaign(null);
+    }
+    if (viewingCampaign) {
+      window.addEventListener("keydown", onKey);
+    }
+    return () => {
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [viewingCampaign]);
 
   return (
     <>
@@ -171,6 +170,7 @@ export default function SupportWeavers() {
 
         {campaigns.length > 0 ? (
           <div className="flex items-center justify-center gap-6">
+            {/* Prev */}
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
@@ -189,52 +189,54 @@ export default function SupportWeavers() {
               return (
                 <div
                   key={c.id}
-                  className={`p-6 border rounded-lg cursor-pointer transition-shadow text-center w-[450px] ${
+                  className={`p-6 border rounded-lg cursor-pointer transition-shadow text-center w-150 ${
                     selectedCampaign == c.id
                       ? "ring-2 ring-accent bg-accent/10"
                       : "hover:shadow-lg"
                   }`}
-                  onClick={() => setSelectedCampaign(c.id)}
                 >
-                  {imageUrl && (
-                    <img
-                      src={imageUrl}
-                      alt={c.title}
-                      className="w-full h-40 object-cover rounded mb-3"
-                    />
-                  )}
-                  <h3 className="text-lg font-semibold">{c.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    {c.description?.slice(0, 80) || "Support local weavers..."}
-                    {c.description?.length > 80 && "..."}
-                  </p>
-                  <div className="mt-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="text-sm font-bold text-[#3b2b2a]">
-                        ₱{Number(c.raisedAmount || 0).toFixed(2)} raised
+                  <div
+                    onClick={() => {
+                      setSelectedCampaign(c.id);
+                      setViewingCampaign(c);
+                    }}
+                  >
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt={c.title}
+                        className="w-full h-40 object-cover rounded mb-3"
+                      />
+                    )}
+                    <h3 className="text-lg font-semibold">{c.title}</h3>
+                    <p className="mt-2 text-sm text-gray-600 one-line">
+                      {c.description || "Support local weavers"}
+                    </p>
+                    <div className="mt-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="text-sm font-bold" style={{ color: '#3b2b2a' }}>
+                          ₱{Number(c.raisedAmount || 0).toFixed(2)} raised
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          ₱{Number(c.donationTarget || 0).toFixed(2)} goal
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        ₱{Number(c.donationTarget || 0).toFixed(2)} goal
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${Math.min(100, ((c.raisedAmount || 0) / (c.donationTarget || 1)) * 100)}%`,
+                            backgroundColor: '#3b2b2a'
+                          }}
+                        ></div>
                       </div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${Math.min(
-                            100,
-                            ((c.raisedAmount || 0) / (c.donationTarget || 1)) *
-                              100
-                          )}%`,
-                          backgroundColor: "#3b2b2a",
-                        }}
-                      ></div>
                     </div>
                   </div>
                 </div>
               );
             })}
 
+            {/* Next */}
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
@@ -248,10 +250,25 @@ export default function SupportWeavers() {
             No active campaigns at the moment.
           </div>
         )}
+
+        {/* Dots */}
+        {campaigns.length > 1 && (
+          <div className="mt-4 flex justify-center gap-2">
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <span
+                key={idx}
+                className={`h-3 w-3 rounded-full ${
+                  page === idx + 1 ? "bg-accent" : "bg-gray-300"
+                }`}
+              ></span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Donation Form */}
       <div className="container py-8 max-w-2xl">
+        {/* Amount */}
         <h3 className="text-xl font-semibold mb-4 text-accent">
           Choose Donation Amount
         </h3>
@@ -284,6 +301,7 @@ export default function SupportWeavers() {
           />
         </div>
 
+        {/* User details */}
         <h3 className="text-xl font-semibold mb-4 text-accent">Your Details</h3>
         <div className="mb-8 grid gap-2 text-left">
           <div className="text-sm text-gray-600">Full name</div>
@@ -302,6 +320,7 @@ export default function SupportWeavers() {
           </div>
         </div>
 
+        {/* Payment */}
         <h3 className="text-xl font-semibold mb-4 text-accent">
           Payment Method
         </h3>
@@ -321,6 +340,7 @@ export default function SupportWeavers() {
           ))}
         </div>
 
+        {/* Conditional fields */}
         {paymentMethod === "card" && (
           <div className="mb-6 space-y-3">
             <input
@@ -373,6 +393,7 @@ export default function SupportWeavers() {
           </div>
         )}
 
+        {/* Submit */}
         <button
           onClick={handleDonate}
           disabled={loading}
@@ -380,46 +401,6 @@ export default function SupportWeavers() {
         >
           {loading ? "Processing..." : "Donate Now"}
         </button>
-      </div>
-
-      {/* Donation History Section */}
-      <div className="container py-10 max-w-4xl">
-        <h2 className="text-2xl font-bold mb-4 text-center text-accent">
-          Your Donation History
-        </h2>
-
-        {donations.length > 0 ? (
-          <div className="overflow-x-auto border rounded-lg">
-            <table className="w-full border-collapse text-sm text-left">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-3 border">Campaign</th>
-                  <th className="p-3 border">Amount</th>
-                  <th className="p-3 border">Method</th>
-                  <th className="p-3 border">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {donations.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50">
-                    <td className="p-3 border">{d.campaign?.title || "—"}</td>
-                    <td className="p-3 border">₱{d.amount}</td>
-                    <td className="p-3 border capitalize">
-                      {d.donationMethod}
-                    </td>
-                    <td className="p-3 border">
-                      {new Date(d.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="text-center text-gray-600">
-            You have not made any donations yet.
-          </p>
-        )}
       </div>
     </>
   );
