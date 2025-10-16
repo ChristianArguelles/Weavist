@@ -51,12 +51,7 @@ export default function Profile(){
                   <path d="M17.414 2.586a2 2 0 010 2.828l-9.193 9.193a1 1 0 01-.465.263l-4 1a1 1 0 01-1.213-1.213l1-4a1 1 0 01.263-.465l9.193-9.193a2 2 0 012.828 0z" />
                 </svg>
               </button>
-            ) : (
-              <div className="flex gap-2">
-                <button onClick={save} disabled={saving} className="px-3 py-1 bg-primary text-white rounded-md text-sm">{saving ? 'Saving...' : 'Save'}</button>
-                <button onClick={cancelEdit} className="px-3 py-1 border rounded-md text-sm">Cancel</button>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -94,10 +89,17 @@ export default function Profile(){
           </div>
         </div>
 
-  {error && <div className="mt-4 text-sm text-primary">{error}</div>}
+        {error && <div className="mt-4 text-sm text-primary">{error}</div>}
 
-        <div className="mt-6 flex items-center justify-end">
-          <button className="bg-primary text-white px-4 py-2 rounded-md font-medium bg-primary-hover" onClick={()=>{ logout(); window.location='/'; }}>Logout</button>
+        <div className="mt-6 flex items-center justify-end gap-2">
+          {editing ? (
+            <>
+              <button onClick={save} disabled={saving} className="px-3 py-1 bg-primary text-white rounded-md text-sm">{saving ? 'Saving...' : 'Save'}</button>
+              <button onClick={cancelEdit} className="px-3 py-1 border rounded-md text-sm">Cancel</button>
+            </>
+          ) : (
+            <button className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary-hover" onClick={()=>{ logout(); window.location='/'; }}>Logout</button>
+          )}
         </div>
       </div>
     </div>
