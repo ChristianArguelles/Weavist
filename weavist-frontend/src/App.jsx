@@ -21,7 +21,7 @@ import AdminDonations from './pages/admin/Donations';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import StoryDetails from "./pages/StoryDetails";
-import ProductHistory from "./pages/ProductHistory";
+import ProductHistory from "./pages/OrderHistory";
 
 function AdminRoute({ children }) {
   const raw = localStorage.getItem('weavist_auth');

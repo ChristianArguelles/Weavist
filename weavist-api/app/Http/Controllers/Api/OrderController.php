@@ -35,16 +35,30 @@ class OrderController extends Controller
             }
         }
 
-        // compute totalAmount from items (price * qty)
+        // compute totalAmount and prepare enriched items
         $total = 0;
-        foreach($data['items'] as $it) {
+        $enrichedItems = [];
+
+        foreach ($data['items'] as $it) {
             $product = \App\Models\Product::find($it['product']['id']);
+            if (!$product) continue;
+
             $price = floatval($product->productPrice ?? $product->price ?? 0);
             $qty = intval($it['quantity']);
-            $total += $price * $qty;
+            $subtotal = $price * $qty;
+            $total += $subtotal;
+
+            $enrichedItems[] = [
+                'product_id' => $product->id,
+                'productName' => $product->productName,
+                'imageUrl' => $product->imageUrl ?? $product->image ?? null,
+                'price' => $price,
+                'quantity' => $qty,
+                'subtotal' => $subtotal,
+            ];
         }
 
-        // create order with total and orderDate
+        // create order with total and enriched items
         $order = Order::create([
             'user_id' => $r->user() ? $r->user()->id : null,
             'name' => $data['name'],
@@ -52,7 +66,7 @@ class OrderController extends Controller
             'phone' => $data['phone'] ?? null,
             'email' => $data['email'] ?? null,
             'status' => 'pending',
-            'items' => $data['items'],
+            'items' => $enrichedItems,
             'totalAmount' => $total,
             'orderDate' => \Carbon\Carbon::now(),
         ]);
