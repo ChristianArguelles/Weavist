@@ -4,37 +4,77 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import TermsModal from '../components/TermsModal';
 
-export default function Register(){
+export default function Register() {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [name,setName]=useState(''); 
-  const [email,setEmail]=useState(''); 
-  const [password,setPassword]=useState('');
-  const [loading,setLoading]=useState(false); 
-  const [error,setError]=useState(''); 
-  const [success,setSuccess]=useState(false);
-  const [termsAccepted,setTermsAccepted]=useState(false); 
-  const [showTermsModal,setShowTermsModal]=useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
-  // New state for password visibility
+  const [fieldErrors, setFieldErrors] = useState({ name: '', email: '', password: '', terms: '', general: '' });
   const [showPassword, setShowPassword] = useState(false);
+
+  // Real-time validation handlers
+  const handleNameChange = e => {
+    const value = e.target.value;
+    setName(value);
+    setFieldErrors(prev => ({
+      ...prev,
+      name: value.trim() ? '' : 'Full name is required.'
+    }));
+  };
+
+  const handleEmailChange = e => {
+    const value = e.target.value;
+    setEmail(value);
+    let error = '';
+    if (!value.trim()) error = 'Email is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email address.';
+    setFieldErrors(prev => ({ ...prev, email: error }));
+  };
+
+  const handlePasswordChange = e => {
+    const value = e.target.value;
+    setPassword(value);
+    let error = '';
+    if (!value) error = 'Password is required.';
+    else if (value.length < 6) error = 'Password must be at least 6 characters.';
+    setFieldErrors(prev => ({ ...prev, password: error }));
+  };
+
+  const handleTermsChange = e => {
+    setTermsAccepted(e.target.checked);
+    setFieldErrors(prev => ({ ...prev, terms: e.target.checked ? '' : 'You must accept the Terms and Conditions.' }));
+  };
+
+  const validate = () => {
+    const errors = {};
+    if (!name.trim()) errors.name = 'Full name is required.';
+    if (!email.trim()) errors.email = 'Email is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Invalid email address.';
+    if (!password) errors.password = 'Password is required.';
+    else if (password.length < 6) errors.password = 'Password must be at least 6 characters.';
+    if (!termsAccepted) errors.terms = 'You must accept the Terms and Conditions.';
+    setFieldErrors(prev => ({ ...prev, ...errors }));
+    return Object.keys(errors).length === 0;
+  };
 
   const submit = async e => {
     e.preventDefault();
-    setLoading(true); setError('');
-    
-    if (!termsAccepted) {
-      setError('You must agree to the Terms and Conditions to proceed.');
-      setLoading(false);
-      return;
-    }
-    
+    if (!validate()) return;
+
+    setLoading(true);
     try {
       const res = await api.post('/auth/register', { name, email, password });
       setSuccess(true);
-      setError('');
-    } catch(err) { 
-      setError(err.response?.data?.message || err.message); 
+      setFieldErrors({});
+    } catch (err) {
+      const backendError = err.response?.data?.message || err.message;
+      setFieldErrors(prev => ({ ...prev, general: backendError }));
     }
     setLoading(false);
   };
@@ -52,10 +92,7 @@ export default function Register(){
               Please click the link in your email to activate your account.
             </p>
           </div>
-          <button 
-            onClick={() => nav('/login')} 
-            className="btn-primary w-full"
-          >
+          <button onClick={() => nav('/login')} className="btn-primary w-full">
             Go to Login
           </button>
         </div>
@@ -71,27 +108,43 @@ export default function Register(){
         <p className="text-sm text-gray-500 mb-6 text-center">Create a free account to get started</p>
 
         <form onSubmit={submit} className="flex flex-col gap-4">
+
+          {/* Full Name */}
           <div>
             <label className="text-sm text-gray-700">Full name</label>
-            <input className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent" placeholder="Your full name" value={name} onChange={e=>setName(e.target.value)} />
+            <input
+              className={`w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent ${fieldErrors.name ? 'border-red-500' : ''}`}
+              placeholder="Your full name"
+              value={name}
+              onChange={handleNameChange}
+            />
+            {fieldErrors.name && <p className="text-red-500 text-xs mt-1">{fieldErrors.name}</p>}
           </div>
 
+          {/* Email */}
           <div>
             <label className="text-sm text-gray-700">Email</label>
-            <input className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent" placeholder="you@domain.com" value={email} onChange={e=>setEmail(e.target.value)} />
+            <input
+              className={`w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent ${fieldErrors.email ? 'border-red-500' : ''}`}
+              placeholder="you@domain.com"
+              value={email}
+              onChange={handleEmailChange}
+            />
+            {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
           </div>
 
+          {/* Password */}
           <div>
             <label className="text-sm text-gray-700">Password</label>
             <div className="relative">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent" 
-                placeholder="Choose a password" 
-                value={password} 
-                onChange={e=>setPassword(e.target.value)} 
+              <input
+                type={showPassword ? "text" : "password"}
+                className={`w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 ring-accent ${fieldErrors.password ? 'border-red-500' : ''}`}
+                placeholder="Choose a password"
+                value={password}
+                onChange={handlePasswordChange}
               />
-              <button 
+              <button
                 type="button"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
                 onClick={() => setShowPassword(!showPassword)}
@@ -108,19 +161,15 @@ export default function Register(){
                 )}
               </button>
             </div>
+            {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
           </div>
 
+          {/* Terms */}
           <div className="flex items-start gap-2">
-            <input 
-              type="checkbox" 
-              id="terms" 
-              checked={termsAccepted} 
-              onChange={e=>setTermsAccepted(e.target.checked)}
-              className="mt-1"
-            />
+            <input type="checkbox" id="terms" checked={termsAccepted} onChange={handleTermsChange} className="mt-1" />
             <label htmlFor="terms" className="text-sm text-gray-700">
               I agree to the{' '}
-              <button 
+              <button
                 type="button"
                 onClick={() => setShowTermsModal(true)}
                 className="text-indigo-600 hover:text-indigo-800 underline"
@@ -129,19 +178,19 @@ export default function Register(){
               </button>
             </label>
           </div>
+          {fieldErrors.terms && <p className="text-red-500 text-xs mt-1">{fieldErrors.terms}</p>}
 
-          {error && <div className="text-primary">{error}</div>}
+          {fieldErrors.general && <p className="text-red-500 text-sm text-center mt-2">{fieldErrors.general}</p>}
 
           <button className="btn-primary w-full" disabled={loading}>{loading ? 'Registering...' : 'Create account'}</button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">Already have an account? <Link to="/login" className="text-indigo-600 font-medium">Login</Link></div>
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Already have an account? <Link to="/login" className="text-indigo-600 font-medium">Login</Link>
+        </div>
       </div>
-      
-      <TermsModal 
-        isOpen={showTermsModal} 
-        onClose={() => setShowTermsModal(false)} 
-      />
+
+      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </div>
   );
 }
